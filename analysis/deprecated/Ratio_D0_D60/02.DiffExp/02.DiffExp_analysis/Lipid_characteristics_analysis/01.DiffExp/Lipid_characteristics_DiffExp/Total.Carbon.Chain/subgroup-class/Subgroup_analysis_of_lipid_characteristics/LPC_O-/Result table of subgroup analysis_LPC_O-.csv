@@ -1,0 +1,2 @@
+"","post.hoc.pval.signif","Total.C","class","comparison","mean_ctrl","mean_exp","FC","log2FC","method","anova.fval","anova.pval","post.hoc.method","post.hoc.pval","post.hoc.mlog10p","post.hoc.padj","post.hoc.mlog10padj","post.hoc.padj.signif"
+"1","yes","16","LPC O-","severe(exp) / mild(ctrl)","2.50e+00","1.67e+00","6.68e-01","-5.82e-01","Two-way ANOVA","NA","NA","t-test","1.93e-02","1.7145","1.93e-02","1.71452","yes"

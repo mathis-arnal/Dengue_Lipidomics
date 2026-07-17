@@ -1,0 +1,4 @@
+"feature","contrast","method","statistic","pval","post.hoc.method","post.hoc.padj"
+"TG 54:2","ctrl-moderate","One-way ANOVA","5.875261379885543","0.005793019664345573","Tukey's HSD","0.00498"
+"TG 54:2","ctrl-severe","One-way ANOVA","5.875261379885543","0.005793019664345573","Tukey's HSD","0.239"
+"TG 54:2","moderate-severe","One-way ANOVA","5.875261379885543","0.005793019664345573","Tukey's HSD","0.844"

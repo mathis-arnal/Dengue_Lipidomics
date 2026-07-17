@@ -1,0 +1,5 @@
+"","post.hoc.pval.signif","Total.C","class","comparison","mean_ctrl","mean_exp","FC","log2FC","method","anova.fval","anova.pval","post.hoc.method","post.hoc.pval","post.hoc.mlog10p","post.hoc.padj","post.hoc.mlog10padj","post.hoc.padj.signif"
+"1","yes","34","DG","severe(exp) / mild(ctrl)","2.55e+00","3.74e+00","1.47e+00","5.56e-01","Two-way ANOVA","3.36e+00","6.87e-02","t-test","1.78e-03","2.7497","7.12e-03","2.1476","yes"
+"2","yes","32","DG","severe(exp) / mild(ctrl)","1.61e+00","2.35e+00","1.46e+00","5.48e-01","Two-way ANOVA","3.36e+00","6.87e-02","t-test","4.12e-03","2.385","8.24e-03","2.084","yes"
+"3","yes","36","DG","severe(exp) / mild(ctrl)","3.71e+00","4.85e+00","1.31e+00","3.87e-01","Two-way ANOVA","3.36e+00","6.87e-02","t-test","6.32e-03","2.200","8.42e-03","2.075","yes"
+"4","no","30","DG","severe(exp) / mild(ctrl)","1.00e+00","9.73e-01","9.71e-01","-4.22e-02","Two-way ANOVA","3.36e+00","6.87e-02","t-test","7.16e-01","0.145","7.16e-01","0.145","no"

@@ -1,0 +1,4 @@
+group1	group2	p.adj
+mild	healthy	0.021028016172948447
+severe	healthy	0.13510990783322357
+severe	mild	0.13510990783322357

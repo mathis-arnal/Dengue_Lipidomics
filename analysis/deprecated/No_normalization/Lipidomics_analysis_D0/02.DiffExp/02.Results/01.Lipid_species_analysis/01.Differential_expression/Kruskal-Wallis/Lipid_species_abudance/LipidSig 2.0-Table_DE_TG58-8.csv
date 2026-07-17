@@ -1,0 +1,4 @@
+"feature","contrast","method","statistic","pval","post.hoc.method","post.hoc.pval","post.hoc.padj"
+"TG 58:8","ctrl-moderate","Kruskal–Wallis test","7.177412163137402","0.02763406352453075","Dunn's Test","0.00944198598279205","0.02832595794837615"
+"TG 58:8","moderate-severe","Kruskal–Wallis test","7.177412163137402","0.02763406352453075","Dunn's Test","0.1141730213876742","0.1712595320815113"
+"TG 58:8","ctrl-severe","Kruskal–Wallis test","7.177412163137402","0.02763406352453075","Dunn's Test","0.9300858378605571","0.9300858378605571"

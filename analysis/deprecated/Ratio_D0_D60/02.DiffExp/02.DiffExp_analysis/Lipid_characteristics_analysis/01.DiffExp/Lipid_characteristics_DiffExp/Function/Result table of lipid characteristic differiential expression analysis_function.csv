@@ -1,0 +1,4 @@
+"","post.hoc.pval.signif","Function","comparison","mean_ctrl","mean_exp","FC","log2FC","method","anova.fval","anova.pval","post.hoc.method","post.hoc.pval","post.hoc.mlog10p","post.hoc.padj","post.hoc.mlog10padj","post.hoc.padj.signif"
+"1","yes","lipid storage","severe(exp) / mild(ctrl)","3.34e+01","4.34e+01","1.3e+00","3.81e-01","Two-way ANOVA","1.93e+00","1.5e-01","t-test","5.63e-03","2.25","1.69e-02","1.77","yes"
+"2","yes","membrane component","severe(exp) / mild(ctrl)","6.61e+01","7.47e+01","1.13e+00","1.76e-01","Two-way ANOVA","1.93e+00","1.5e-01","t-test","1.68e-02","1.78","2.52e-02","1.6","yes"
+"3","no","lipid-mediated signalling","severe(exp) / mild(ctrl)","2.42e+01","2.59e+01","1.07e+00","1.02e-01","Two-way ANOVA","1.93e+00","1.5e-01","t-test","3.43e-01","0.464","3.43e-01","0.464","no"

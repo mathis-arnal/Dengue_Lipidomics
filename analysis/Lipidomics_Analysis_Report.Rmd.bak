@@ -1,0 +1,753 @@
+---
+title: "Lipidomics Analysis Report"
+subtitle: "Comparative Analysis of Healthy, Mild, and Severe COVID-19 Patients"
+author: "Your Name"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    number_sections: true
+    theme: flatly
+    highlight: tango
+    code_folding: hide
+    fig_width: 10
+    fig_height: 8
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  warning = FALSE,
+  message = FALSE,
+  fig.align = "center"
+)
+
+# Load required libraries
+library(knitr)
+library(kableExtra)
+```
+
+# Executive Summary
+
+**[ADD YOUR EXECUTIVE SUMMARY HERE]**
+
+Brief overview of the study objectives, methodology, and key findings.
+
+---
+
+# Introduction
+
+## Study Objectives
+
+**[ADD YOUR STUDY OBJECTIVES HERE]**
+
+## Sample Description
+
+**[ADD YOUR SAMPLE DESCRIPTION HERE]**
+
+- Number of healthy controls:
+- Number of mild COVID-19 patients:
+- Number of severe COVID-19 patients:
+- Timepoint: D0 (day 0)
+
+## Methodology
+
+### Data Processing Pipeline
+
+1. **Data Loading & Quality Control**
+   - Lipid nomenclature parsing using rgoslin
+   - Recognition rate: >97%
+
+2. **Data Processing**
+   - Filtering: 50% threshold (lipids present in at least 50% of samples)
+   - Missing value imputation: Minimum value method
+   - Normalization: Percentage normalization
+   - Transformation: Log10 transformation
+
+3. **Statistical Analysis**
+   - Multi-group comparison: One-way ANOVA
+   - Post-hoc pairwise comparisons: t-test
+   - Multiple testing correction: Benjamini-Hochberg (FDR)
+   - Significance threshold: padj < 0.05
+
+4. **Enrichment Analysis**
+   - Lipid Set Enrichment Analysis (LSEA)
+   - Over Representation Analysis (ORA)
+
+**[ADD YOUR METHODOLOGY COMMENTS HERE]**
+
+---
+
+# Three-Group Analysis (Healthy vs Mild vs Severe)
+
+## Overview
+
+**[ADD YOUR OVERVIEW FOR THREE-GROUP ANALYSIS HERE]**
+
+This section presents the results of the one-way ANOVA comparing lipid profiles across all three groups simultaneously.
+
+## Data Quality Assessment
+
+### Before and After Processing
+
+```{r three-group-quality}
+include_graphics("Three_groups/D0/01.Profiling/00.Data_quality/BoxPlot_before_process.png")
+include_graphics("Three_groups/D0/01.Profiling/00.Data_quality/BoxPlot_after_process.png")
+```
+
+**[ADD YOUR COMMENTS ON DATA QUALITY HERE]**
+
+### Density Plots
+
+```{r three-group-density}
+include_graphics("Three_groups/D0/01.Profiling/00.Data_quality/DensityPlot_before_process.png")
+include_graphics("Three_groups/D0/01.Profiling/00.Data_quality/DensityPlot_after_process.png")
+```
+
+**[ADD YOUR COMMENTS ON DENSITY PLOTS HERE]**
+
+## Sample Profiling
+
+### Cross-Sample Variability
+
+```{r three-group-variability}
+include_graphics("Three_groups/D0/01.Profiling/01.Cross-sample_variability/Expressed_lipid_numbers.png")
+include_graphics("Three_groups/D0/01.Profiling/01.Cross-sample_variability/Lipid_abundance_distribution.png")
+```
+
+**[ADD YOUR COMMENTS ON VARIABILITY HERE]**
+
+### Dimensionality Reduction
+
+#### PCA (Principal Component Analysis)
+
+```{r three-group-pca}
+include_graphics("Three_groups/D0/01.Profiling/02.Dimensionality_reduction/PCA/PCA_plot.png")
+include_graphics("Three_groups/D0/01.Profiling/02.Dimensionality_reduction/PCA/Scree_plot.png")
+```
+
+**[ADD YOUR COMMENTS ON PCA HERE]**
+
+#### t-SNE
+
+```{r three-group-tsne}
+include_graphics("Three_groups/D0/01.Profiling/02.Dimensionality_reduction/t-SNE/tSNE_plot.png")
+```
+
+**[ADD YOUR COMMENTS ON t-SNE HERE]**
+
+#### UMAP
+
+```{r three-group-umap}
+include_graphics("Three_groups/D0/01.Profiling/02.Dimensionality_reduction/UMAP/UMAP_plot.png")
+```
+
+**[ADD YOUR COMMENTS ON UMAP HERE]**
+
+### Correlation Analysis
+
+```{r three-group-correlation}
+include_graphics("Three_groups/D0/01.Profiling/03.Correlation_Heatmap/by_samples/Correlation_heatmap_samples.png")
+include_graphics("Three_groups/D0/01.Profiling/03.Correlation_Heatmap/by_category/Correlation_heatmap_category.png")
+include_graphics("Three_groups/D0/01.Profiling/03.Correlation_Heatmap/by_class/Correlation_heatmap_class.png")
+```
+
+**[ADD YOUR COMMENTS ON CORRELATION ANALYSIS HERE]**
+
+### Lipid Characteristics
+
+```{r three-group-characteristics}
+include_graphics("Three_groups/D0/01.Profiling/04.Lipid_characteristics/Lipid_characteristics_by_class.png")
+include_graphics("Three_groups/D0/01.Profiling/04.Lipid_characteristics/Lipid_characteristics_by_TotalC.png")
+include_graphics("Three_groups/D0/01.Profiling/04.Lipid_characteristics/Lipid_characteristics_by_TotalDB.png")
+include_graphics("Three_groups/D0/01.Profiling/04.Lipid_characteristics/Lipid_characteristics_by_Category.png")
+```
+
+**[ADD YOUR COMMENTS ON LIPID CHARACTERISTICS HERE]**
+
+## Differential Expression Analysis (ANOVA)
+
+### Summary Statistics
+
+**[ADD ANOVA SUMMARY STATISTICS TABLE HERE]**
+
+```{r three-group-anova-stats, eval=FALSE}
+# Read ANOVA results
+anova_results <- read.delim("Three_groups/D0/02.DiffExp/01.ANOVA/ANOVA_all_results.tsv")
+
+# Summary table
+cat("Total lipids analyzed:", nrow(anova_results), "\n")
+cat("Significant lipids (padj < 0.05):", sum(anova_results$padj < 0.05, na.rm = TRUE), "\n")
+```
+
+**[ADD YOUR INTERPRETATION OF ANOVA RESULTS HERE]**
+
+### Visualization
+
+```{r three-group-anova-viz}
+include_graphics("Three_groups/D0/02.DiffExp/02.Visualizations/Lollipop_chart.png")
+include_graphics("Three_groups/D0/02.DiffExp/02.Visualizations/Heatmap/Heatmap_significant_lipids.png")
+```
+
+**[ADD YOUR COMMENTS ON ANOVA VISUALIZATIONS HERE]**
+
+### Individual Lipid Boxplots
+
+```{r three-group-boxplots, eval=FALSE}
+# List top 10 significant lipids
+boxplot_files <- list.files("Three_groups/D0/02.DiffExp/03.Individual_lipid_boxplots",
+                            pattern = "*.png", full.names = TRUE)
+# Display first 10 boxplots
+for(i in 1:min(10, length(boxplot_files))) {
+  include_graphics(boxplot_files[i])
+}
+```
+
+**[ADD YOUR COMMENTS ON INDIVIDUAL LIPID PROFILES HERE]**
+
+## Enrichment Analysis
+
+### Lipid Set Enrichment Analysis (LSEA)
+
+```{r three-group-lsea}
+include_graphics("Three_groups/D0/03.Enrichment/LSEA/LSEA_all_barplot.png")
+include_graphics("Three_groups/D0/03.Enrichment/LSEA/LSEA_by_class_barplot.png")
+include_graphics("Three_groups/D0/03.Enrichment/LSEA/LSEA_by_category_barplot.png")
+```
+
+**[ADD YOUR COMMENTS ON LSEA RESULTS HERE]**
+
+### Over Representation Analysis (ORA)
+
+```{r three-group-ora}
+include_graphics("Three_groups/D0/03.Enrichment/ORA/ORA_all_barplot.png")
+include_graphics("Three_groups/D0/03.Enrichment/ORA/ORA_by_class_barplot.png")
+include_graphics("Three_groups/D0/03.Enrichment/ORA/ORA_by_category_barplot.png")
+```
+
+**[ADD YOUR COMMENTS ON ORA RESULTS HERE]**
+
+---
+
+# Post-Hoc Analysis 1: Healthy vs Mild
+
+## Overview
+
+**[ADD YOUR OVERVIEW FOR HEALTHY VS MILD COMPARISON HERE]**
+
+## Data Quality and Profiling
+
+### Quality Assessment
+
+```{r healthy-mild-quality}
+include_graphics("PostHoc_Healthy_vs_Mild/D0/01.Profiling/00.Data_quality/Data_quality_boxplot_before.png")
+include_graphics("PostHoc_Healthy_vs_Mild/D0/01.Profiling/00.Data_quality/Data_quality_boxplot_after.png")
+```
+
+**[ADD YOUR COMMENTS HERE]**
+
+### Dimensionality Reduction
+
+```{r healthy-mild-dr}
+include_graphics("PostHoc_Healthy_vs_Mild/D0/01.Profiling/02.Dimensionality_reduction/PCA/PCA_plot.png")
+include_graphics("PostHoc_Healthy_vs_Mild/D0/01.Profiling/02.Dimensionality_reduction/t-SNE/tSNE_plot.png")
+include_graphics("PostHoc_Healthy_vs_Mild/D0/01.Profiling/02.Dimensionality_reduction/UMAP/UMAP_plot.png")
+```
+
+**[ADD YOUR COMMENTS ON DIMENSIONALITY REDUCTION HERE]**
+
+### Correlation Analysis
+
+```{r healthy-mild-correlation}
+include_graphics("PostHoc_Healthy_vs_Mild/D0/01.Profiling/03.Correlation_Heatmap/by_samples/Correlation_heatmap_samples.png")
+```
+
+**[ADD YOUR COMMENTS ON CORRELATION HERE]**
+
+### Lipid Characteristics
+
+```{r healthy-mild-characteristics}
+include_graphics("PostHoc_Healthy_vs_Mild/D0/01.Profiling/04.Lipid_characteristics/Lipid_characteristics_by_class.png")
+```
+
+**[ADD YOUR COMMENTS ON LIPID CHARACTERISTICS HERE]**
+
+## Differential Expression Analysis
+
+### Summary Statistics
+
+**[ADD T-TEST SUMMARY STATISTICS TABLE HERE]**
+
+```{r healthy-mild-stats, eval=FALSE}
+# Read t-test results
+ttest_results <- read.delim("PostHoc_Healthy_vs_Mild/D0/02.DiffExp/01.t-test_results/t-test_results.tsv")
+
+# Summary table
+cat("Total lipids tested:", nrow(ttest_results), "\n")
+cat("Significant lipids (padj < 0.05):", sum(ttest_results$padj < 0.05, na.rm = TRUE), "\n")
+cat("Up-regulated in Mild:", sum(ttest_results$padj < 0.05 & ttest_results$log2FC > 0, na.rm = TRUE), "\n")
+cat("Down-regulated in Mild:", sum(ttest_results$padj < 0.05 & ttest_results$log2FC < 0, na.rm = TRUE), "\n")
+```
+
+**[ADD YOUR INTERPRETATION HERE]**
+
+### Visualization
+
+```{r healthy-mild-diffexp}
+include_graphics("PostHoc_Healthy_vs_Mild/D0/02.DiffExp/02.Visualizations/Volcano/Volcano_plot.png")
+include_graphics("PostHoc_Healthy_vs_Mild/D0/02.DiffExp/02.Visualizations/MA_plot/MA_plot.png")
+include_graphics("PostHoc_Healthy_vs_Mild/D0/02.DiffExp/02.Visualizations/Lollipop_chart.png")
+```
+
+**[ADD YOUR COMMENTS ON VISUALIZATIONS HERE]**
+
+### Differential Expression by Lipid Characteristics
+
+```{r healthy-mild-dechar}
+include_graphics("PostHoc_Healthy_vs_Mild/D0/02.DiffExp/02.Visualizations/deChar_TotalC_barplot.png")
+include_graphics("PostHoc_Healthy_vs_Mild/D0/02.DiffExp/02.Visualizations/deChar_Category_barplot.png")
+include_graphics("PostHoc_Healthy_vs_Mild/D0/02.DiffExp/02.Visualizations/deChar_Class_barplot.png")
+```
+
+**[ADD YOUR COMMENTS ON DIFFERENTIAL CHARACTERISTICS HERE]**
+
+### Individual Lipid Boxplots
+
+```{r healthy-mild-boxplots, eval=FALSE}
+# List top 10 significant lipids
+boxplot_files <- list.files("PostHoc_Healthy_vs_Mild/D0/02.DiffExp/03.Individual_lipid_boxplots",
+                            pattern = "*.png", full.names = TRUE)
+# Display first 10 boxplots
+for(i in 1:min(10, length(boxplot_files))) {
+  include_graphics(boxplot_files[i])
+}
+```
+
+**[ADD YOUR COMMENTS ON INDIVIDUAL LIPID PROFILES HERE]**
+
+## Enrichment Analysis
+
+### LSEA
+
+```{r healthy-mild-lsea}
+include_graphics("PostHoc_Healthy_vs_Mild/D0/03.Enrichment/LSEA/LSEA_by_class_barplot.png")
+include_graphics("PostHoc_Healthy_vs_Mild/D0/03.Enrichment/LSEA/LSEA_by_category_barplot.png")
+```
+
+**[ADD YOUR COMMENTS ON LSEA HERE]**
+
+### ORA
+
+```{r healthy-mild-ora}
+include_graphics("PostHoc_Healthy_vs_Mild/D0/03.Enrichment/ORA/ORA_by_class_barplot.png")
+include_graphics("PostHoc_Healthy_vs_Mild/D0/03.Enrichment/ORA/ORA_by_category_barplot.png")
+```
+
+**[ADD YOUR COMMENTS ON ORA HERE]**
+
+---
+
+# Post-Hoc Analysis 2: Healthy vs Severe
+
+## Overview
+
+**[ADD YOUR OVERVIEW FOR HEALTHY VS SEVERE COMPARISON HERE]**
+
+## Data Quality and Profiling
+
+### Quality Assessment
+
+```{r healthy-severe-quality}
+include_graphics("PostHoc_Healthy_vs_Severe/D0/01.Profiling/00.Data_quality/Data_quality_boxplot_before.png")
+include_graphics("PostHoc_Healthy_vs_Severe/D0/01.Profiling/00.Data_quality/Data_quality_boxplot_after.png")
+```
+
+**[ADD YOUR COMMENTS HERE]**
+
+### Dimensionality Reduction
+
+```{r healthy-severe-dr}
+include_graphics("PostHoc_Healthy_vs_Severe/D0/01.Profiling/02.Dimensionality_reduction/PCA/PCA_plot.png")
+include_graphics("PostHoc_Healthy_vs_Severe/D0/01.Profiling/02.Dimensionality_reduction/t-SNE/tSNE_plot.png")
+include_graphics("PostHoc_Healthy_vs_Severe/D0/01.Profiling/02.Dimensionality_reduction/UMAP/UMAP_plot.png")
+```
+
+**[ADD YOUR COMMENTS ON DIMENSIONALITY REDUCTION HERE]**
+
+### Correlation Analysis
+
+```{r healthy-severe-correlation}
+include_graphics("PostHoc_Healthy_vs_Severe/D0/01.Profiling/03.Correlation_Heatmap/by_samples/Correlation_heatmap_samples.png")
+```
+
+**[ADD YOUR COMMENTS ON CORRELATION HERE]**
+
+### Lipid Characteristics
+
+```{r healthy-severe-characteristics}
+include_graphics("PostHoc_Healthy_vs_Severe/D0/01.Profiling/04.Lipid_characteristics/Lipid_characteristics_by_class.png")
+```
+
+**[ADD YOUR COMMENTS ON LIPID CHARACTERISTICS HERE]**
+
+## Differential Expression Analysis
+
+### Summary Statistics
+
+**[ADD T-TEST SUMMARY STATISTICS TABLE HERE]**
+
+```{r healthy-severe-stats, eval=FALSE}
+# Read t-test results
+ttest_results <- read.delim("PostHoc_Healthy_vs_Severe/D0/02.DiffExp/01.t-test_results/t-test_results.tsv")
+
+# Summary table
+cat("Total lipids tested:", nrow(ttest_results), "\n")
+cat("Significant lipids (padj < 0.05):", sum(ttest_results$padj < 0.05, na.rm = TRUE), "\n")
+cat("Up-regulated in Severe:", sum(ttest_results$padj < 0.05 & ttest_results$log2FC > 0, na.rm = TRUE), "\n")
+cat("Down-regulated in Severe:", sum(ttest_results$padj < 0.05 & ttest_results$log2FC < 0, na.rm = TRUE), "\n")
+```
+
+**[ADD YOUR INTERPRETATION HERE]**
+
+### Visualization
+
+```{r healthy-severe-diffexp}
+include_graphics("PostHoc_Healthy_vs_Severe/D0/02.DiffExp/02.Visualizations/Volcano/Volcano_plot.png")
+include_graphics("PostHoc_Healthy_vs_Severe/D0/02.DiffExp/02.Visualizations/MA_plot/MA_plot.png")
+include_graphics("PostHoc_Healthy_vs_Severe/D0/02.DiffExp/02.Visualizations/Lollipop_chart.png")
+```
+
+**[ADD YOUR COMMENTS ON VISUALIZATIONS HERE]**
+
+### Differential Expression by Lipid Characteristics
+
+```{r healthy-severe-dechar}
+include_graphics("PostHoc_Healthy_vs_Severe/D0/02.DiffExp/02.Visualizations/deChar_TotalC_barplot.png")
+include_graphics("PostHoc_Healthy_vs_Severe/D0/02.DiffExp/02.Visualizations/deChar_Category_barplot.png")
+include_graphics("PostHoc_Healthy_vs_Severe/D0/02.DiffExp/02.Visualizations/deChar_Class_barplot.png")
+```
+
+**[ADD YOUR COMMENTS ON DIFFERENTIAL CHARACTERISTICS HERE]**
+
+### Individual Lipid Boxplots
+
+```{r healthy-severe-boxplots, eval=FALSE}
+# List top 10 significant lipids
+boxplot_files <- list.files("PostHoc_Healthy_vs_Severe/D0/02.DiffExp/03.Individual_lipid_boxplots",
+                            pattern = "*.png", full.names = TRUE)
+# Display first 10 boxplots
+for(i in 1:min(10, length(boxplot_files))) {
+  include_graphics(boxplot_files[i])
+}
+```
+
+**[ADD YOUR COMMENTS ON INDIVIDUAL LIPID PROFILES HERE]**
+
+## Enrichment Analysis
+
+### LSEA
+
+```{r healthy-severe-lsea}
+include_graphics("PostHoc_Healthy_vs_Severe/D0/03.Enrichment/LSEA/LSEA_by_class_barplot.png")
+include_graphics("PostHoc_Healthy_vs_Severe/D0/03.Enrichment/LSEA/LSEA_by_category_barplot.png")
+```
+
+**[ADD YOUR COMMENTS ON LSEA HERE]**
+
+### ORA
+
+```{r healthy-severe-ora}
+include_graphics("PostHoc_Healthy_vs_Severe/D0/03.Enrichment/ORA/ORA_by_class_barplot.png")
+include_graphics("PostHoc_Healthy_vs_Severe/D0/03.Enrichment/ORA/ORA_by_category_barplot.png")
+```
+
+**[ADD YOUR COMMENTS ON ORA HERE]**
+
+---
+
+# Post-Hoc Analysis 3: Mild vs Severe
+
+## Overview
+
+**[ADD YOUR OVERVIEW FOR MILD VS SEVERE COMPARISON HERE]**
+
+## Data Quality and Profiling
+
+### Quality Assessment
+
+```{r mild-severe-quality}
+include_graphics("PostHoc_Mild_vs_Severe/D0/01.Profiling/00.Data_quality/Data_quality_boxplot_before.png")
+include_graphics("PostHoc_Mild_vs_Severe/D0/01.Profiling/00.Data_quality/Data_quality_boxplot_after.png")
+```
+
+**[ADD YOUR COMMENTS HERE]**
+
+### Dimensionality Reduction
+
+```{r mild-severe-dr}
+include_graphics("PostHoc_Mild_vs_Severe/D0/01.Profiling/02.Dimensionality_reduction/PCA/PCA_plot.png")
+include_graphics("PostHoc_Mild_vs_Severe/D0/01.Profiling/02.Dimensionality_reduction/t-SNE/tSNE_plot.png")
+include_graphics("PostHoc_Mild_vs_Severe/D0/01.Profiling/02.Dimensionality_reduction/UMAP/UMAP_plot.png")
+```
+
+**[ADD YOUR COMMENTS ON DIMENSIONALITY REDUCTION HERE]**
+
+### Correlation Analysis
+
+```{r mild-severe-correlation}
+include_graphics("PostHoc_Mild_vs_Severe/D0/01.Profiling/03.Correlation_Heatmap/by_samples/Correlation_heatmap_samples.png")
+```
+
+**[ADD YOUR COMMENTS ON CORRELATION HERE]**
+
+### Lipid Characteristics
+
+```{r mild-severe-characteristics}
+include_graphics("PostHoc_Mild_vs_Severe/D0/01.Profiling/04.Lipid_characteristics/Lipid_characteristics_by_class.png")
+```
+
+**[ADD YOUR COMMENTS ON LIPID CHARACTERISTICS HERE]**
+
+## Differential Expression Analysis
+
+### Summary Statistics
+
+**[ADD T-TEST SUMMARY STATISTICS TABLE HERE]**
+
+```{r mild-severe-stats, eval=FALSE}
+# Read t-test results
+ttest_results <- read.delim("PostHoc_Mild_vs_Severe/D0/02.DiffExp/01.t-test_results/t-test_results.tsv")
+
+# Summary table
+cat("Total lipids tested:", nrow(ttest_results), "\n")
+cat("Significant lipids (padj < 0.05):", sum(ttest_results$padj < 0.05, na.rm = TRUE), "\n")
+cat("Up-regulated in Severe:", sum(ttest_results$padj < 0.05 & ttest_results$log2FC > 0, na.rm = TRUE), "\n")
+cat("Down-regulated in Severe:", sum(ttest_results$padj < 0.05 & ttest_results$log2FC < 0, na.rm = TRUE), "\n")
+```
+
+**[ADD YOUR INTERPRETATION HERE]**
+
+### Visualization
+
+```{r mild-severe-diffexp}
+include_graphics("PostHoc_Mild_vs_Severe/D0/02.DiffExp/02.Visualizations/Volcano/Volcano_plot.png")
+include_graphics("PostHoc_Mild_vs_Severe/D0/02.DiffExp/02.Visualizations/MA_plot/MA_plot.png")
+include_graphics("PostHoc_Mild_vs_Severe/D0/02.DiffExp/02.Visualizations/Lollipop_chart.png")
+```
+
+**[ADD YOUR COMMENTS ON VISUALIZATIONS HERE]**
+
+### Differential Expression by Lipid Characteristics
+
+```{r mild-severe-dechar}
+include_graphics("PostHoc_Mild_vs_Severe/D0/02.DiffExp/02.Visualizations/deChar_TotalC_barplot.png")
+include_graphics("PostHoc_Mild_vs_Severe/D0/02.DiffExp/02.Visualizations/deChar_Category_barplot.png")
+include_graphics("PostHoc_Mild_vs_Severe/D0/02.DiffExp/02.Visualizations/deChar_Class_barplot.png")
+```
+
+**[ADD YOUR COMMENTS ON DIFFERENTIAL CHARACTERISTICS HERE]**
+
+### Individual Lipid Boxplots
+
+```{r mild-severe-boxplots, eval=FALSE}
+# List top 10 significant lipids
+boxplot_files <- list.files("PostHoc_Mild_vs_Severe/D0/02.DiffExp/03.Individual_lipid_boxplots",
+                            pattern = "*.png", full.names = TRUE)
+# Display first 10 boxplots
+for(i in 1:min(10, length(boxplot_files))) {
+  include_graphics(boxplot_files[i])
+}
+```
+
+**[ADD YOUR COMMENTS ON INDIVIDUAL LIPID PROFILES HERE]**
+
+## Enrichment Analysis
+
+### LSEA
+
+```{r mild-severe-lsea}
+include_graphics("PostHoc_Mild_vs_Severe/D0/03.Enrichment/LSEA/LSEA_by_class_barplot.png")
+include_graphics("PostHoc_Mild_vs_Severe/D0/03.Enrichment/LSEA/LSEA_by_category_barplot.png")
+```
+
+**[ADD YOUR COMMENTS ON LSEA HERE]**
+
+### ORA
+
+```{r mild-severe-ora}
+include_graphics("PostHoc_Mild_vs_Severe/D0/03.Enrichment/ORA/ORA_by_class_barplot.png")
+include_graphics("PostHoc_Mild_vs_Severe/D0/03.Enrichment/ORA/ORA_by_category_barplot.png")
+```
+
+**[ADD YOUR COMMENTS ON ORA HERE]**
+
+---
+
+# Cross-Comparison Summary
+
+## Overview
+
+**[ADD YOUR CROSS-COMPARISON OVERVIEW HERE]**
+
+This section summarizes the key findings across all three pairwise comparisons.
+
+## Venn Diagram of Significant Lipids
+
+**[ADD VENN DIAGRAM OR CREATE ONE HERE]**
+
+```{r venn-diagram, eval=FALSE}
+# Code to create Venn diagram comparing significant lipids across comparisons
+# library(VennDiagram)
+#
+# healthy_mild <- read.delim("PostHoc_Healthy_vs_Mild/D0/02.DiffExp/01.t-test_results/t-test_results.tsv")
+# healthy_severe <- read.delim("PostHoc_Healthy_vs_Severe/D0/02.DiffExp/01.t-test_results/t-test_results.tsv")
+# mild_severe <- read.delim("PostHoc_Mild_vs_Severe/D0/02.DiffExp/01.t-test_results/t-test_results.tsv")
+#
+# sig_hm <- healthy_mild$feature[healthy_mild$padj < 0.05]
+# sig_hs <- healthy_severe$feature[healthy_severe$padj < 0.05]
+# sig_ms <- mild_severe$feature[mild_severe$padj < 0.05]
+```
+
+**[ADD YOUR INTERPRETATION OF OVERLAP HERE]**
+
+## Common Patterns Across Comparisons
+
+### Lipid Classes
+
+**[ADD COMPARISON TABLE OF AFFECTED LIPID CLASSES HERE]**
+
+**[ADD YOUR COMMENTS HERE]**
+
+### Fold Changes
+
+**[ADD COMPARISON OF FOLD CHANGES FOR KEY LIPIDS HERE]**
+
+**[ADD YOUR COMMENTS HERE]**
+
+### Enrichment Pathways
+
+**[ADD COMPARISON OF ENRICHED PATHWAYS HERE]**
+
+**[ADD YOUR COMMENTS HERE]**
+
+---
+
+# Discussion
+
+## Key Findings
+
+**[ADD YOUR KEY FINDINGS HERE]**
+
+1.
+2.
+3.
+
+## Biological Interpretation
+
+**[ADD YOUR BIOLOGICAL INTERPRETATION HERE]**
+
+### Lipid Metabolism Alterations
+
+**[ADD YOUR COMMENTS HERE]**
+
+### Disease Progression
+
+**[ADD YOUR COMMENTS HERE]**
+
+### Potential Biomarkers
+
+**[ADD YOUR COMMENTS HERE]**
+
+## Comparison with Literature
+
+**[ADD YOUR LITERATURE COMPARISON HERE]**
+
+## Limitations
+
+**[ADD YOUR STUDY LIMITATIONS HERE]**
+
+1.
+2.
+3.
+
+## Future Directions
+
+**[ADD YOUR FUTURE DIRECTIONS HERE]**
+
+1.
+2.
+3.
+
+---
+
+# Conclusions
+
+**[ADD YOUR CONCLUSIONS HERE]**
+
+---
+
+# Methods Details
+
+## Software and Packages
+
+- **R version**: `r R.version.string`
+- **LipidSigR**: Comprehensive lipidomics analysis
+- **rgoslin**: Lipid nomenclature parsing
+- **SummarizedExperiment**: Data structure for omics data
+- **ggplot2**: Data visualization
+- **ggsignif**: Statistical annotations on plots
+
+## Data Processing Parameters
+
+- **Filtering threshold**: 50% (lipids present in ≥50% of samples)
+- **Missing value imputation**: Minimum value method
+- **Normalization**: Percentage normalization
+- **Transformation**: Log10
+- **Statistical test**:
+  - Multi-group: One-way ANOVA
+  - Pairwise: t-test
+- **Multiple testing correction**: Benjamini-Hochberg (FDR)
+- **Significance threshold**: padj < 0.05
+- **Fold change threshold**: |log2FC| > 1
+
+## Enrichment Analysis Parameters
+
+- **LSEA**:
+  - Ranking method: test statistic
+  - Significance: pval < 0.05
+- **ORA**:
+  - Significance: pval < 0.05
+
+---
+
+# Appendix
+
+## Session Information
+
+```{r session-info}
+sessionInfo()
+```
+
+## File Paths
+
+- **Analysis directory**: `/Users/loictalignani/research/project/lipidomics/analysis/`
+- **Three-group analysis**: `Three_groups/D0/`
+- **Post-hoc Healthy vs Mild**: `PostHoc_Healthy_vs_Mild/D0/`
+- **Post-hoc Healthy vs Severe**: `PostHoc_Healthy_vs_Severe/D0/`
+- **Post-hoc Mild vs Severe**: `PostHoc_Mild_vs_Severe/D0/`
+
+---
+
+# References
+
+**[ADD YOUR REFERENCES HERE]**
+
+1.
+2.
+3.
+
+---
+
+*Report generated on: `r Sys.Date()`*

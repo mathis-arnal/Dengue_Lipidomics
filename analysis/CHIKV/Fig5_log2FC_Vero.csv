@@ -1,0 +1,166 @@
+lipid_family,comparison,treatment,control,log2FC,pvalue,significance
+DG,CHIKV + DMSO vs. DMSO,Vero DMSO CHIKV,Vero DMSO,3.11783,0.0318882,*
+CER,CHIKV + DMSO vs. DMSO,Vero DMSO CHIKV,Vero DMSO,0.973666,0.00193665,**
+CHOL,CHIKV + DMSO vs. DMSO,Vero DMSO CHIKV,Vero DMSO,-0.470949,0.393217,ns
+HEX2CER,CHIKV + DMSO vs. DMSO,Vero DMSO CHIKV,Vero DMSO,-0.0451924,0.910968,ns
+HEXCER,CHIKV + DMSO vs. DMSO,Vero DMSO CHIKV,Vero DMSO,0.332224,0.411817,ns
+LPC,CHIKV + DMSO vs. DMSO,Vero DMSO CHIKV,Vero DMSO,0.990682,0.00254927,**
+LPE,CHIKV + DMSO vs. DMSO,Vero DMSO CHIKV,Vero DMSO,,,
+PC,CHIKV + DMSO vs. DMSO,Vero DMSO CHIKV,Vero DMSO,1.61033,0.00195033,**
+PE,CHIKV + DMSO vs. DMSO,Vero DMSO CHIKV,Vero DMSO,2.30732,0.0118505,*
+SM,CHIKV + DMSO vs. DMSO,Vero DMSO CHIKV,Vero DMSO,1.18677,0.00391233,**
+TG,CHIKV + DMSO vs. DMSO,Vero DMSO CHIKV,Vero DMSO,-1.62999,,
+FA,CHIKV + DMSO vs. DMSO,Vero DMSO CHIKV,Vero DMSO,0.259035,0.576693,ns
+PS,CHIKV + DMSO vs. DMSO,Vero DMSO CHIKV,Vero DMSO,1.3663,0.012309,*
+PI,CHIKV + DMSO vs. DMSO,Vero DMSO CHIKV,Vero DMSO,1.45754,3.63716e-05,***
+PG,CHIKV + DMSO vs. DMSO,Vero DMSO CHIKV,Vero DMSO,1.23078,0.0703567,ns
+DG,HMN214 vs. DMSO,Vero HMN214 CHIKV,Vero DMSO CHIKV,-2.36141,0.0345457,*
+CER,HMN214 vs. DMSO,Vero HMN214 CHIKV,Vero DMSO CHIKV,-0.465342,0.0119675,*
+CHOL,HMN214 vs. DMSO,Vero HMN214 CHIKV,Vero DMSO CHIKV,0.297798,0.571304,ns
+HEX2CER,HMN214 vs. DMSO,Vero HMN214 CHIKV,Vero DMSO CHIKV,0.0402074,0.864465,ns
+HEXCER,HMN214 vs. DMSO,Vero HMN214 CHIKV,Vero DMSO CHIKV,1.57603,0.031784,*
+LPC,HMN214 vs. DMSO,Vero HMN214 CHIKV,Vero DMSO CHIKV,-0.177491,0.168069,ns
+LPE,HMN214 vs. DMSO,Vero HMN214 CHIKV,Vero DMSO CHIKV,,,
+PC,HMN214 vs. DMSO,Vero HMN214 CHIKV,Vero DMSO CHIKV,-1.51862,0.002789,**
+PE,HMN214 vs. DMSO,Vero HMN214 CHIKV,Vero DMSO CHIKV,-2.73129,0.00417114,**
+SM,HMN214 vs. DMSO,Vero HMN214 CHIKV,Vero DMSO CHIKV,-1.13656,0.00690638,**
+TG,HMN214 vs. DMSO,Vero HMN214 CHIKV,Vero DMSO CHIKV,0.7815,0.640086,ns
+FA,HMN214 vs. DMSO,Vero HMN214 CHIKV,Vero DMSO CHIKV,0.14304,0.731495,ns
+PS,HMN214 vs. DMSO,Vero HMN214 CHIKV,Vero DMSO CHIKV,-1.56271,0.00516639,**
+PI,HMN214 vs. DMSO,Vero HMN214 CHIKV,Vero DMSO CHIKV,-1.30455,0.00233309,**
+PG,HMN214 vs. DMSO,Vero HMN214 CHIKV,Vero DMSO CHIKV,-1.15742,0.0818889,ns
+DG,CHIKV + HMN214 vs. CHIKV + DMSO,Vero HMN214 CHIKV,Vero HMN214,-0.497673,0.629575,ns
+CER,CHIKV + HMN214 vs. CHIKV + DMSO,Vero HMN214 CHIKV,Vero HMN214,0.108362,0.654452,ns
+CHOL,CHIKV + HMN214 vs. CHIKV + DMSO,Vero HMN214 CHIKV,Vero HMN214,0.535237,0.375539,ns
+HEX2CER,CHIKV + HMN214 vs. CHIKV + DMSO,Vero HMN214 CHIKV,Vero HMN214,0.160834,0.605698,ns
+HEXCER,CHIKV + HMN214 vs. CHIKV + DMSO,Vero HMN214 CHIKV,Vero HMN214,0.0718856,0.839134,ns
+LPC,CHIKV + HMN214 vs. CHIKV + DMSO,Vero HMN214 CHIKV,Vero HMN214,0.0664022,0.724086,ns
+LPE,CHIKV + HMN214 vs. CHIKV + DMSO,Vero HMN214 CHIKV,Vero HMN214,,,
+PC,CHIKV + HMN214 vs. CHIKV + DMSO,Vero HMN214 CHIKV,Vero HMN214,0.129161,0.663663,ns
+PE,CHIKV + HMN214 vs. CHIKV + DMSO,Vero HMN214 CHIKV,Vero HMN214,-0.438864,0.614567,ns
+SM,CHIKV + HMN214 vs. CHIKV + DMSO,Vero HMN214 CHIKV,Vero HMN214,0.148538,0.522408,ns
+TG,CHIKV + HMN214 vs. CHIKV + DMSO,Vero HMN214 CHIKV,Vero HMN214,-1.07152,0.387142,ns
+FA,CHIKV + HMN214 vs. CHIKV + DMSO,Vero HMN214 CHIKV,Vero HMN214,0.109884,0.814877,ns
+PS,CHIKV + HMN214 vs. CHIKV + DMSO,Vero HMN214 CHIKV,Vero HMN214,-0.188361,0.695713,ns
+PI,CHIKV + HMN214 vs. CHIKV + DMSO,Vero HMN214 CHIKV,Vero HMN214,0.196135,0.436192,ns
+PG,CHIKV + HMN214 vs. CHIKV + DMSO,Vero HMN214 CHIKV,Vero HMN214,-0.154355,0.752459,ns
+DG,Simvastatin vs. DMSO,Vero Simvastatin CHIKV,Vero DMSO CHIKV,-5.7722,0.0372394,*
+CER,Simvastatin vs. DMSO,Vero Simvastatin CHIKV,Vero DMSO CHIKV,-1.09391,0.00124245,**
+CHOL,Simvastatin vs. DMSO,Vero Simvastatin CHIKV,Vero DMSO CHIKV,-0.0800543,0.820403,ns
+HEX2CER,Simvastatin vs. DMSO,Vero Simvastatin CHIKV,Vero DMSO CHIKV,-0.548332,0.0188985,*
+HEXCER,Simvastatin vs. DMSO,Vero Simvastatin CHIKV,Vero DMSO CHIKV,0.667688,0.0361479,*
+LPC,Simvastatin vs. DMSO,Vero Simvastatin CHIKV,Vero DMSO CHIKV,-0.643463,0.00410361,**
+LPE,Simvastatin vs. DMSO,Vero Simvastatin CHIKV,Vero DMSO CHIKV,,,
+PC,Simvastatin vs. DMSO,Vero Simvastatin CHIKV,Vero DMSO CHIKV,-1.47179,0.003325,**
+PE,Simvastatin vs. DMSO,Vero Simvastatin CHIKV,Vero DMSO CHIKV,-2.04471,0.0111294,*
+SM,Simvastatin vs. DMSO,Vero Simvastatin CHIKV,Vero DMSO CHIKV,-1.19002,0.00302972,**
+TG,Simvastatin vs. DMSO,Vero Simvastatin CHIKV,Vero DMSO CHIKV,-2.8264,0.0868316,ns
+FA,Simvastatin vs. DMSO,Vero Simvastatin CHIKV,Vero DMSO CHIKV,-0.281298,0.492127,ns
+PS,Simvastatin vs. DMSO,Vero Simvastatin CHIKV,Vero DMSO CHIKV,-1.22957,0.00719132,**
+PI,Simvastatin vs. DMSO,Vero Simvastatin CHIKV,Vero DMSO CHIKV,-1.09735,0.00243315,**
+PG,Simvastatin vs. DMSO,Vero Simvastatin CHIKV,Vero DMSO CHIKV,-1.39515,0.0691849,ns
+DG,CHIKV + Simvastatin vs. CHIKV + DMSO,Vero Simvastatin CHIKV,Vero Simvastatin,-2.09498,0.0378389,*
+CER,CHIKV + Simvastatin vs. CHIKV + DMSO,Vero Simvastatin CHIKV,Vero Simvastatin,-0.120644,0.631649,ns
+CHOL,CHIKV + Simvastatin vs. CHIKV + DMSO,Vero Simvastatin CHIKV,Vero Simvastatin,0.571105,0.186772,ns
+HEX2CER,CHIKV + Simvastatin vs. CHIKV + DMSO,Vero Simvastatin CHIKV,Vero Simvastatin,0.114529,0.592721,ns
+HEXCER,CHIKV + Simvastatin vs. CHIKV + DMSO,Vero Simvastatin CHIKV,Vero Simvastatin,-0.174079,0.480655,ns
+LPC,CHIKV + Simvastatin vs. CHIKV + DMSO,Vero Simvastatin CHIKV,Vero Simvastatin,0.139739,0.343771,ns
+LPE,CHIKV + Simvastatin vs. CHIKV + DMSO,Vero Simvastatin CHIKV,Vero Simvastatin,,,
+PC,CHIKV + Simvastatin vs. CHIKV + DMSO,Vero Simvastatin CHIKV,Vero Simvastatin,-0.100257,0.653365,ns
+PE,CHIKV + Simvastatin vs. CHIKV + DMSO,Vero Simvastatin CHIKV,Vero Simvastatin,-0.84563,0.295004,ns
+SM,CHIKV + Simvastatin vs. CHIKV + DMSO,Vero Simvastatin CHIKV,Vero Simvastatin,-0.0447442,0.843762,ns
+TG,CHIKV + Simvastatin vs. CHIKV + DMSO,Vero Simvastatin CHIKV,Vero Simvastatin,-3.40079,0.367479,ns
+FA,CHIKV + Simvastatin vs. CHIKV + DMSO,Vero Simvastatin CHIKV,Vero Simvastatin,-0.291579,0.365645,ns
+PS,CHIKV + Simvastatin vs. CHIKV + DMSO,Vero Simvastatin CHIKV,Vero Simvastatin,0.270237,0.373841,ns
+PI,CHIKV + Simvastatin vs. CHIKV + DMSO,Vero Simvastatin CHIKV,Vero Simvastatin,0.251943,0.296768,ns
+PG,CHIKV + Simvastatin vs. CHIKV + DMSO,Vero Simvastatin CHIKV,Vero Simvastatin,0.00302814,0.993324,ns
+DG,Atorvastatin vs. DMSO,Vero Atorvastatin CHIKV,Vero DMSO CHIKV,-4.53323,0.038659,*
+CER,Atorvastatin vs. DMSO,Vero Atorvastatin CHIKV,Vero DMSO CHIKV,-0.91478,0.00182782,**
+CHOL,Atorvastatin vs. DMSO,Vero Atorvastatin CHIKV,Vero DMSO CHIKV,-0.0748898,0.868264,ns
+HEX2CER,Atorvastatin vs. DMSO,Vero Atorvastatin CHIKV,Vero DMSO CHIKV,-0.1095,0.580921,ns
+HEXCER,Atorvastatin vs. DMSO,Vero Atorvastatin CHIKV,Vero DMSO CHIKV,1.04591,0.0171988,*
+LPC,Atorvastatin vs. DMSO,Vero Atorvastatin CHIKV,Vero DMSO CHIKV,-0.665674,0.00451519,**
+LPE,Atorvastatin vs. DMSO,Vero Atorvastatin CHIKV,Vero DMSO CHIKV,,,
+PC,Atorvastatin vs. DMSO,Vero Atorvastatin CHIKV,Vero DMSO CHIKV,-1.17187,0.00332913,**
+PE,Atorvastatin vs. DMSO,Vero Atorvastatin CHIKV,Vero DMSO CHIKV,-1.42849,0.0163833,*
+SM,Atorvastatin vs. DMSO,Vero Atorvastatin CHIKV,Vero DMSO CHIKV,-0.758618,0.022322,*
+TG,Atorvastatin vs. DMSO,Vero Atorvastatin CHIKV,Vero DMSO CHIKV,-0.814405,0.338985,ns
+FA,Atorvastatin vs. DMSO,Vero Atorvastatin CHIKV,Vero DMSO CHIKV,-0.752459,0.159529,ns
+PS,Atorvastatin vs. DMSO,Vero Atorvastatin CHIKV,Vero DMSO CHIKV,-0.781265,0.0155547,*
+PI,Atorvastatin vs. DMSO,Vero Atorvastatin CHIKV,Vero DMSO CHIKV,-0.886252,0.0358582,*
+PG,Atorvastatin vs. DMSO,Vero Atorvastatin CHIKV,Vero DMSO CHIKV,-1.18044,0.076534,ns
+DG,CHIKV + Atorvastatin vs. CHIKV + DMSO,Vero Atorvastatin CHIKV,Vero Atorvastatin,0.14689,0.854067,ns
+CER,CHIKV + Atorvastatin vs. CHIKV + DMSO,Vero Atorvastatin CHIKV,Vero Atorvastatin,0.0811922,0.566163,ns
+CHOL,CHIKV + Atorvastatin vs. CHIKV + DMSO,Vero Atorvastatin CHIKV,Vero Atorvastatin,-0.413047,0.373703,ns
+HEX2CER,CHIKV + Atorvastatin vs. CHIKV + DMSO,Vero Atorvastatin CHIKV,Vero Atorvastatin,0.432631,0.171388,ns
+HEXCER,CHIKV + Atorvastatin vs. CHIKV + DMSO,Vero Atorvastatin CHIKV,Vero Atorvastatin,0.286599,0.172276,ns
+LPC,CHIKV + Atorvastatin vs. CHIKV + DMSO,Vero Atorvastatin CHIKV,Vero Atorvastatin,0.254913,0.162787,ns
+LPE,CHIKV + Atorvastatin vs. CHIKV + DMSO,Vero Atorvastatin CHIKV,Vero Atorvastatin,,,
+PC,CHIKV + Atorvastatin vs. CHIKV + DMSO,Vero Atorvastatin CHIKV,Vero Atorvastatin,0.41555,0.171399,ns
+PE,CHIKV + Atorvastatin vs. CHIKV + DMSO,Vero Atorvastatin CHIKV,Vero Atorvastatin,1.00857,0.0339701,*
+SM,CHIKV + Atorvastatin vs. CHIKV + DMSO,Vero Atorvastatin CHIKV,Vero Atorvastatin,0.354115,0.275776,ns
+TG,CHIKV + Atorvastatin vs. CHIKV + DMSO,Vero Atorvastatin CHIKV,Vero Atorvastatin,1.86449,0.288104,ns
+FA,CHIKV + Atorvastatin vs. CHIKV + DMSO,Vero Atorvastatin CHIKV,Vero Atorvastatin,-0.770178,0.206421,ns
+PS,CHIKV + Atorvastatin vs. CHIKV + DMSO,Vero Atorvastatin CHIKV,Vero Atorvastatin,0.556049,0.115871,ns
+PI,CHIKV + Atorvastatin vs. CHIKV + DMSO,Vero Atorvastatin CHIKV,Vero Atorvastatin,0.360032,0.324825,ns
+PG,CHIKV + Atorvastatin vs. CHIKV + DMSO,Vero Atorvastatin CHIKV,Vero Atorvastatin,0.167862,0.751029,ns
+DG,Fenretinide vs. DMSO,Vero Fenretinide CHIKV,Vero DMSO CHIKV,-2.66555,0.043527,*
+CER,Fenretinide vs. DMSO,Vero Fenretinide CHIKV,Vero DMSO CHIKV,-1.99301,0.000437522,***
+CHOL,Fenretinide vs. DMSO,Vero Fenretinide CHIKV,Vero DMSO CHIKV,-0.176465,0.664477,ns
+HEX2CER,Fenretinide vs. DMSO,Vero Fenretinide CHIKV,Vero DMSO CHIKV,-1.34715,0.015403,*
+HEXCER,Fenretinide vs. DMSO,Vero Fenretinide CHIKV,Vero DMSO CHIKV,-2.57011,0.00102661,**
+LPC,Fenretinide vs. DMSO,Vero Fenretinide CHIKV,Vero DMSO CHIKV,-0.220655,0.44292,ns
+LPE,Fenretinide vs. DMSO,Vero Fenretinide CHIKV,Vero DMSO CHIKV,,,
+PC,Fenretinide vs. DMSO,Vero Fenretinide CHIKV,Vero DMSO CHIKV,-1.32232,0.00255356,**
+PE,Fenretinide vs. DMSO,Vero Fenretinide CHIKV,Vero DMSO CHIKV,-2.21856,0.00684591,**
+SM,Fenretinide vs. DMSO,Vero Fenretinide CHIKV,Vero DMSO CHIKV,-1.1551,0.00453004,**
+TG,Fenretinide vs. DMSO,Vero Fenretinide CHIKV,Vero DMSO CHIKV,-0.41372,0.653918,ns
+FA,Fenretinide vs. DMSO,Vero Fenretinide CHIKV,Vero DMSO CHIKV,-0.166679,0.646161,ns
+PS,Fenretinide vs. DMSO,Vero Fenretinide CHIKV,Vero DMSO CHIKV,-0.788063,0.0235381,*
+PI,Fenretinide vs. DMSO,Vero Fenretinide CHIKV,Vero DMSO CHIKV,-0.919087,0.0115329,*
+PG,Fenretinide vs. DMSO,Vero Fenretinide CHIKV,Vero DMSO CHIKV,-1.2548,0.0681682,ns
+DG,CHIKV + Fenretinide vs. CHIKV + DMSO,Vero Fenretinide CHIKV,Vero Fenretinide,1.972,0.236222,ns
+CER,CHIKV + Fenretinide vs. CHIKV + DMSO,Vero Fenretinide CHIKV,Vero Fenretinide,0.0901468,0.681898,ns
+CHOL,CHIKV + Fenretinide vs. CHIKV + DMSO,Vero Fenretinide CHIKV,Vero Fenretinide,0.00501161,0.993915,ns
+HEX2CER,CHIKV + Fenretinide vs. CHIKV + DMSO,Vero Fenretinide CHIKV,Vero Fenretinide,-0.264082,0.612601,ns
+HEXCER,CHIKV + Fenretinide vs. CHIKV + DMSO,Vero Fenretinide CHIKV,Vero Fenretinide,-0.586075,0.187805,ns
+LPC,CHIKV + Fenretinide vs. CHIKV + DMSO,Vero Fenretinide CHIKV,Vero Fenretinide,0.201141,0.53181,ns
+LPE,CHIKV + Fenretinide vs. CHIKV + DMSO,Vero Fenretinide CHIKV,Vero Fenretinide,,,
+PC,CHIKV + Fenretinide vs. CHIKV + DMSO,Vero Fenretinide CHIKV,Vero Fenretinide,0.00338985,0.990777,ns
+PE,CHIKV + Fenretinide vs. CHIKV + DMSO,Vero Fenretinide CHIKV,Vero Fenretinide,0.777248,0.372493,ns
+SM,CHIKV + Fenretinide vs. CHIKV + DMSO,Vero Fenretinide CHIKV,Vero Fenretinide,0.0946174,0.733427,ns
+TG,CHIKV + Fenretinide vs. CHIKV + DMSO,Vero Fenretinide CHIKV,Vero Fenretinide,2.78138,,
+FA,CHIKV + Fenretinide vs. CHIKV + DMSO,Vero Fenretinide CHIKV,Vero Fenretinide,-0.0980173,0.787174,ns
+PS,CHIKV + Fenretinide vs. CHIKV + DMSO,Vero Fenretinide CHIKV,Vero Fenretinide,0.135747,0.758271,ns
+PI,CHIKV + Fenretinide vs. CHIKV + DMSO,Vero Fenretinide CHIKV,Vero Fenretinide,0.385055,0.214502,ns
+PG,CHIKV + Fenretinide vs. CHIKV + DMSO,Vero Fenretinide CHIKV,Vero Fenretinide,0.198293,0.70917,ns
+DG,Proflavine vs. DMSO,Vero Proflavine CHIKV,Vero DMSO CHIKV,,,
+CER,Proflavine vs. DMSO,Vero Proflavine CHIKV,Vero DMSO CHIKV,-0.825829,0.00507917,**
+CHOL,Proflavine vs. DMSO,Vero Proflavine CHIKV,Vero DMSO CHIKV,-0.328904,0.386912,ns
+HEX2CER,Proflavine vs. DMSO,Vero Proflavine CHIKV,Vero DMSO CHIKV,-1.8531,0.00300426,**
+HEXCER,Proflavine vs. DMSO,Vero Proflavine CHIKV,Vero DMSO CHIKV,-2.68193,0.00525429,**
+LPC,Proflavine vs. DMSO,Vero Proflavine CHIKV,Vero DMSO CHIKV,-0.856833,0.00350525,**
+LPE,Proflavine vs. DMSO,Vero Proflavine CHIKV,Vero DMSO CHIKV,,,
+PC,Proflavine vs. DMSO,Vero Proflavine CHIKV,Vero DMSO CHIKV,-1.82918,0.00191636,**
+PE,Proflavine vs. DMSO,Vero Proflavine CHIKV,Vero DMSO CHIKV,-3.00188,0.0104429,*
+SM,Proflavine vs. DMSO,Vero Proflavine CHIKV,Vero DMSO CHIKV,-1.19573,0.00300788,**
+TG,Proflavine vs. DMSO,Vero Proflavine CHIKV,Vero DMSO CHIKV,3.20106,0.245701,ns
+FA,Proflavine vs. DMSO,Vero Proflavine CHIKV,Vero DMSO CHIKV,-0.0997943,0.838122,ns
+PS,Proflavine vs. DMSO,Vero Proflavine CHIKV,Vero DMSO CHIKV,-1.62524,0.00332514,**
+PI,Proflavine vs. DMSO,Vero Proflavine CHIKV,Vero DMSO CHIKV,-1.49877,0.000461597,***
+PG,Proflavine vs. DMSO,Vero Proflavine CHIKV,Vero DMSO CHIKV,-1.61457,0.0586559,ns
+DG,CHIKV + Proflavine vs. CHIKV + DMSO,Vero Proflavine CHIKV,Vero Proflavine,,,
+CER,CHIKV + Proflavine vs. CHIKV + DMSO,Vero Proflavine CHIKV,Vero Proflavine,0.322393,0.184848,ns
+CHOL,CHIKV + Proflavine vs. CHIKV + DMSO,Vero Proflavine CHIKV,Vero Proflavine,0.0959936,0.772277,ns
+HEX2CER,CHIKV + Proflavine vs. CHIKV + DMSO,Vero Proflavine CHIKV,Vero Proflavine,0.495518,,
+HEXCER,CHIKV + Proflavine vs. CHIKV + DMSO,Vero Proflavine CHIKV,Vero Proflavine,1.09165,0.048006,*
+LPC,CHIKV + Proflavine vs. CHIKV + DMSO,Vero Proflavine CHIKV,Vero Proflavine,0.450815,0.0940109,ns
+LPE,CHIKV + Proflavine vs. CHIKV + DMSO,Vero Proflavine CHIKV,Vero Proflavine,,,
+PC,CHIKV + Proflavine vs. CHIKV + DMSO,Vero Proflavine CHIKV,Vero Proflavine,0.485278,0.173317,ns
+PE,CHIKV + Proflavine vs. CHIKV + DMSO,Vero Proflavine CHIKV,Vero Proflavine,0.640475,0.281186,ns
+SM,CHIKV + Proflavine vs. CHIKV + DMSO,Vero Proflavine CHIKV,Vero Proflavine,0.451483,0.131766,ns
+TG,CHIKV + Proflavine vs. CHIKV + DMSO,Vero Proflavine CHIKV,Vero Proflavine,2.89006,0.255189,ns
+FA,CHIKV + Proflavine vs. CHIKV + DMSO,Vero Proflavine CHIKV,Vero Proflavine,-0.232862,0.576466,ns
+PS,CHIKV + Proflavine vs. CHIKV + DMSO,Vero Proflavine CHIKV,Vero Proflavine,0.639252,0.0801384,ns
+PI,CHIKV + Proflavine vs. CHIKV + DMSO,Vero Proflavine CHIKV,Vero Proflavine,0.323469,0.121816,ns
+PG,CHIKV + Proflavine vs. CHIKV + DMSO,Vero Proflavine CHIKV,Vero Proflavine,0.915712,0.0843195,ns
