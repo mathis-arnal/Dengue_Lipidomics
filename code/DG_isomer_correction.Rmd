@@ -1,0 +1,168 @@
+---
+title: "DG species: regioisomer double-counting check and fix"
+output:
+  html_document:
+    theme: flatly
+    toc: true
+    toc_float: true
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+library(readxl)
+library(dplyr)
+```
+
+# Background
+
+`data/pretreatment/MISSE_Global_Lipidomics_results_all.tsv` (the file `code/lipidomics.ipynb`
+splits into the per-timepoint `Lipid_abundance_data_D0/D03/D10/D60.tsv` files) does not come from
+the `Raw datas` sheet of `data/raw_data/MISSE_Global_Lipidomic_results.xlsx` — its values match the
+`Normalisation_µL_plasma` sheet (`Approached_Quantification` (ng) divided by extracted plasma
+volume (µL)).
+
+That sheet reports diacylglycerol (DG) species at the *regioisomer* level — separate
+`(1,2) DG x:y` and `(1,3) DG x:y` rows for the same species — while every other lipid class in the
+sheet has exactly one row per species. This report checks how the two DG isomer rows were
+consolidated into the single `DG x:y` row that ends up in the merged all-timepoints TSV, and
+writes out a corrected file if they were not simply summed.
+
+# Reading the raw sheet
+
+```{r load-raw}
+f <- "../data/raw_data/MISSE_Global_Lipidomic_results.xlsx"
+raw <- read_excel(f, sheet = "Normalisation_µL_plasma", col_names = FALSE)
+
+sample_names <- as.character(raw[5, 4:ncol(raw)])
+fam <- raw[[1]]
+metab <- raw[[3]]
+```
+
+The raw header row also has a data-entry slip unrelated to the DG isomer issue: three columns are
+labeled `KT-927D03`/`KT-928D10`/`KT-929D60` instead of `KT-926D03`/`KT-926D10`/`KT-926D60` (patient
+KT-926's own `KT-926D0` column is correct — a copy-paste increment error). The merged TSV already
+has this fixed, so the same relabeling is applied here to keep every column matched.
+
+```{r fix-header-typo}
+typo_fix <- c("KT-927D03" = "KT-926D03", "KT-928D10" = "KT-926D10", "KT-929D60" = "KT-926D60")
+sample_names[sample_names %in% names(typo_fix)] <- typo_fix[sample_names[sample_names %in% names(typo_fix)]]
+
+fam_ff <- fam
+for (i in seq_along(fam_ff)) if (i > 1 && is.na(fam_ff[i])) fam_ff[i] <- fam_ff[i - 1]
+
+data_rows <- 7:nrow(raw)
+fam_d <- fam_ff[data_rows]
+metab_d <- metab[data_rows]
+values <- as.data.frame(raw[data_rows, 4:ncol(raw)])
+colnames(values) <- sample_names
+for (col in colnames(values)) values[[col]] <- suppressWarnings(as.numeric(values[[col]]))
+```
+
+Each lipid class block ends with its own `Somme espèces <class>` total row (13 classes). Only DG
+has `(1,2)`/`(1,3)` prefixed rows for the same carbon:double-bond composition:
+
+```{r check-isomer-scope}
+is_total <- grepl("^Somme", metab_d, ignore.case = TRUE)
+m <- regexpr("^\\([^)]*\\)\\s*", metab_d)
+has_prefix <- (m > 0) & !is_total
+
+table(family = fam_d[!is_total], has_isomer_prefix = has_prefix[!is_total])
+```
+
+# Building the isomer-summed species table
+
+```{r build-species-table}
+species_tbl <- values[!is_total, ]
+species_tbl$family <- fam_d[!is_total]
+species_tbl$metabolite <- metab_d[!is_total]
+species_tbl$species <- ifelse(
+  has_prefix[!is_total],
+  sub("^\\([^)]*\\)\\s*", "", species_tbl$metabolite),
+  species_tbl$metabolite
+)
+
+dg_summed <- species_tbl %>%
+  filter(family == "DG") %>%
+  group_by(species) %>%
+  summarise(across(all_of(sample_names), sum), .groups = "drop")
+
+dg_summed
+```
+
+Sanity check: the sheet's own `Somme espèces DG` row should equal the per-sample sum across these
+10 species (isomers combined).
+
+```{r validate-total}
+dg_total_row <- as.numeric(values[is_total & fam_d == "DG", ])
+dg_recomputed_total <- colSums(dg_summed[, sample_names])
+max(abs(dg_total_row - dg_recomputed_total), na.rm = TRUE)
+```
+
+# Comparing against the current merged TSV
+
+```{r compare-current}
+cur <- read.delim("../data/pretreatment/MISSE_Global_Lipidomics_results_all.tsv", check.names = FALSE)
+common_samples <- intersect(sample_names, colnames(cur))
+
+cur_dg <- cur %>% filter(feature %in% dg_summed$species) %>% arrange(feature)
+new_dg <- dg_summed %>% arrange(species)
+
+cur_dg_num <- cur_dg
+for (col in common_samples) cur_dg_num[[col]] <- as.numeric(gsub(",", ".", cur_dg[[col]]))
+
+diff_summary <- sapply(seq_len(nrow(new_dg)), function(i) {
+  a <- round(as.numeric(new_dg[i, common_samples]), 2)
+  b <- as.numeric(cur_dg_num[cur_dg_num$feature == new_dg$species[i], common_samples])
+  max(abs(a - b), na.rm = TRUE)
+})
+data.frame(species = new_dg$species, max_abs_diff_vs_current = diff_summary) %>%
+  arrange(desc(max_abs_diff_vs_current))
+```
+
+The current TSV keeps only the `(1,2)` isomer value (falling back to `(1,3)` when no `(1,2)` row
+exists) instead of summing both — `DG 32:0`, `32:1`, `34:1`, `34:3`, and `36:3` (the species
+measured as both regioisomers) are undercounted; the other five DG species (measured as a single
+isomer only) are unaffected.
+
+# Writing the corrected file
+
+`read.delim`/`write.table` silently strip the literal double quotes the source file wraps around
+feature names containing a semicolon (e.g. `"Cer 34:1;O2"`), so round-tripping the whole table
+through R would change every such row's exact text even though only the values matter. Instead,
+only the 10 DG lines are spliced into the original file's raw text — every other line is copied
+through byte-for-byte.
+
+```{r write-corrected}
+fmt <- function(x) gsub("\\.", ",", formatC(x, format = "f", digits = 2))
+
+orig_path <- "../data/pretreatment/MISSE_Global_Lipidomics_results_all.tsv"
+raw_text <- readChar(orig_path, file.info(orig_path)$size, useBytes = TRUE)
+eol <- if (grepl("\r\n", raw_text, fixed = TRUE)) "\r\n" else "\n"
+had_trailing_newline <- grepl(paste0(eol, "$"), raw_text)
+lines <- strsplit(raw_text, "\r?\n")[[1]]
+line_feature <- sub("\t.*$", "", lines)
+
+new_lines <- lines
+stopifnot(setequal(colnames(cur)[-1], sample_names))
+for (i in seq_len(nrow(new_dg))) {
+  row_i <- which(line_feature == new_dg$species[i])
+  values_in_file_order <- fmt(as.numeric(new_dg[i, colnames(cur)[-1]]))
+  new_lines[row_i] <- paste(c(new_dg$species[i], values_in_file_order), collapse = "\t")
+}
+
+out_path <- "../data/pretreatment/MISSE_Global_Lipidomics_results_all_corrected.tsv"
+out_text <- paste(new_lines, collapse = eol)
+if (had_trailing_newline) out_text <- paste0(out_text, eol)
+writeChar(out_text, out_path, eos = NULL, useBytes = TRUE)
+
+changed_lines <- which(new_lines != lines)
+data.frame(row = changed_lines, feature = line_feature[changed_lines])
+identical(lines[-changed_lines], new_lines[-changed_lines])
+```
+
+`data/pretreatment/MISSE_Global_Lipidomics_results_all_corrected.tsv` is identical to the original
+`..._all.tsv` byte-for-byte except for the 10 DG species lines, which now sum the `(1,2)` and
+`(1,3)` regioisomer values. Regenerating the per-timepoint
+`Lipid_abundance_data_D0/D03/D10/D60.tsv` and the `lipidsig_datasets/` files from this corrected
+source is a separate follow-up step, not done here.
