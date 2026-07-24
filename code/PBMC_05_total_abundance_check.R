@@ -17,20 +17,17 @@ library(tidyr)
 library(readr)
 library(ggplot2)
 
+source("code/lipidomics_functions.R")
+
 base_dir <- "analysis/PBMC/Three_groups/D0/04.Total_abundance_check"
 dir.create(base_dir, recursive = TRUE, showWarnings = FALSE)
 
-group_info <- read_tsv("data/PBMC/group_information_table_healthy_vs_sick_patients_D0_all.tsv")
-abundance <- read_tsv("data/PBMC/PBMC_Lipid_abundance_data_D0.tsv")
-
-matched_samples <- intersect(group_info$sample_name, colnames(abundance))
-abundance <- abundance %>% dplyr::select(feature, all_of(matched_samples))
-group_info <- group_info %>% dplyr::filter(sample_name %in% matched_samples)
-
-cat("Matched samples:", length(matched_samples), "\n")
-cat("  Healthy:", sum(group_info$group == "healthy"), "\n")
-cat("  Mild:", sum(group_info$group == "mild"), "\n")
-cat("  Severe:", sum(group_info$group == "severe"), "\n")
+loaded <- load_and_match_samples(
+  "data/PBMC/group_information_table_healthy_vs_sick_patients_D0_all.tsv",
+  "data/PBMC/PBMC_Lipid_abundance_data_D0.tsv"
+)
+abundance <- loaded$abundance
+group_info <- loaded$group_info
 
 totals <- abundance %>%
   dplyr::select(-feature) %>%

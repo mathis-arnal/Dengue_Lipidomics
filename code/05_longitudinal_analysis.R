@@ -5,8 +5,8 @@
 # GOAL: track how each patient's lipidome evolves across all 4 timepoints, rather than
 # comparing groups cross-sectionally at a single timepoint.
 #
-# DATA SOURCE: data/lipidsig_datasets/Deprecated/Lipid_abundance_data_{D0,D03,D10,D60}.tsv
-# + matching group_information_table_*.xlsx. Despite living in "Deprecated", this is the
+# DATA SOURCE: data/lipidsig_datasets/Longitudinal_matched/Lipid_abundance_data_{D0,D03,D10,D60}.tsv
+# + matching group_information_table_*.xlsx. This is the
 # only dataset in the project where the SAME 43 patients (mild/severe, no healthy) are
 # tracked with raw abundances at all 4 timepoints, in identical sample order/columns.
 # There is no longitudinal healthy-control data anywhere in the project, so healthy
@@ -82,16 +82,16 @@ cat("========================================\n")
 cat("\n=== 1. DATA LOADING ===\n")
 
 abund_files <- list(
-  D0  = "data/lipidsig_datasets/Deprecated/Lipid_abundance_data_D0.tsv",
-  D3  = "data/lipidsig_datasets/Deprecated/Lipid_abundance_data_D03.tsv",
-  D10 = "data/lipidsig_datasets/Deprecated/Lipid_abundance_data_D10.tsv",
-  D60 = "data/lipidsig_datasets/Deprecated/Lipid_abundance_data_D60.tsv"
+  D0  = "data/lipidsig_datasets/Longitudinal_matched/Lipid_abundance_data_D0.tsv",
+  D3  = "data/lipidsig_datasets/Longitudinal_matched/Lipid_abundance_data_D03.tsv",
+  D10 = "data/lipidsig_datasets/Longitudinal_matched/Lipid_abundance_data_D10.tsv",
+  D60 = "data/lipidsig_datasets/Longitudinal_matched/Lipid_abundance_data_D60.tsv"
 )
 group_files <- list(
-  D0  = "data/lipidsig_datasets/Deprecated/group_information_table_D0.xlsx",
-  D3  = "data/lipidsig_datasets/Deprecated/group_information_table_D03.xlsx",
-  D10 = "data/lipidsig_datasets/Deprecated/group_information_table_D10.xlsx",
-  D60 = "data/lipidsig_datasets/Deprecated/group_information_table_D60.xlsx"
+  D0  = "data/lipidsig_datasets/Longitudinal_matched/group_information_table_D0.xlsx",
+  D3  = "data/lipidsig_datasets/Longitudinal_matched/group_information_table_D03.xlsx",
+  D10 = "data/lipidsig_datasets/Longitudinal_matched/group_information_table_D10.xlsx",
+  D60 = "data/lipidsig_datasets/Longitudinal_matched/group_information_table_D60.xlsx"
 )
 
 abund_list <- lapply(abund_files, read_tsv, show_col_types = FALSE)

@@ -55,7 +55,34 @@ abundance$feature <- gsub("\\(\\d+,\\d+\\) DG", "DG", abundance$feature)
 # change Cer 34:1,O2 to Cer 34:1;O2
 abundance$feature <- gsub(",", ";", abundance$feature)
 
-# Get rid of the total rows, which are not needed 
+# Rename ether-lipid (plasmalogen/alkyl-ether ambiguous) species to match the plasma
+# study's naming convention, e.g. "PC O-32:1//PC P-32:0" -> "PC 32:1;O/32:0;P", so the
+# same underlying species is directly comparable across tissue types. Built by matching
+# PBMC's raw rgoslin-style names against plasma's actual feature list
+# (data/lipidsig_datasets/healthy_vs_sick_patients/healthy_sick_lipidomics.tsv) on
+# (class, O-value, P-value) -- only the 11 PBMC species that have a genuine matching
+# plasma counterpart are renamed; the other paired/standalone ether species measured in
+# PBMC (e.g. PC O-36:0, PC O-40:1//PC P-40:0) have no plasma equivalent at this chain
+# composition and are deliberately left in PBMC's native format rather than reformatted
+# into a plasma-style string that wouldn't actually correspond to any plasma feature.
+ether_lipid_rename <- c(
+  "PC O-32:1//PC P-32:0" = "PC 32:1;O/32:0;P",
+  "PC O-34:1//PC P-34:0" = "PC 34:0;P/34:1;O",
+  "PC O-34:2//PC P-34:1" = "PC 34:1;P/34:2;O",
+  "PC O-36:2//PC P-36:1" = "PC 36:1;P/36:2;O",
+  "PC O-36:3//PC P-36:2" = "PC 36:2;P/36:3;O",
+  "PC O-38:3//PC P-38:2" = "PC 38:2;P/38:3;O",
+  "PC O-38:4//PC P-38:3" = "PC 38:3;P/38:4;O",
+  "PC O-38:5//PC P-38:4" = "PC 38:4;P/38:5;O",
+  "PC O-40:4//PC P-40:3" = "PC 40:3;P/40:4;O",
+  "PC O-42:4//PC P-42:3" = "PC 42:3;P/42:4;O",
+  "PE O-38:5//PE P-38:4" = "PE 38:4;P/38:5;O"
+)
+matched_ether <- abundance$feature %in% names(ether_lipid_rename)
+cat(sprintf("Renaming %d ether-lipid feature(s) to match plasma naming convention.\n", sum(matched_ether)))
+abundance$feature[matched_ether] <- ether_lipid_rename[abundance$feature[matched_ether]]
+
+# Get rid of the total rows, which are not needed
 abundance <- abundance %>% dplyr::filter(!grepl("Total", feature))
 
 write_tsv(abundance, "data/PBMC/PBMC_lipid_abundance_data_D0.tsv")

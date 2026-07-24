@@ -1,6 +1,0 @@
-"","post.hoc.pval.signif","Cellular.Component","mean_ctrl","mean_moderate","mean_severe","method","anova.fval","anova.pval","post.hoc.method","post.hoc.pval","post.hoc.mlog10p","post.hoc.padj","post.hoc.mlog10padj","post.hoc.padj.signif"
-"1","yes","lipid droplet","4.01e+01","8.1e+01","7.19e+01","Two-way ANOVA","5.62e+00","1.97e-06","One-way ANOVA","3.2e-03","2.5","1.6e-02","1.8","yes"
-"2","no","endosome/lysosome","2.79e+02","2.37e+02","2.53e+02","Two-way ANOVA","5.62e+00","1.97e-06","One-way ANOVA","1.74e-01","0.759","2.57e-01","0.59","no"
-"3","no","golgi apparatus","2.75e+02","2.35e+02","2.51e+02","Two-way ANOVA","5.62e+00","1.97e-06","One-way ANOVA","1.99e-01","0.702","2.57e-01","0.59","no"
-"4","no","plasma membrane","2.77e+02","2.37e+02","2.53e+02","Two-way ANOVA","5.62e+00","1.97e-06","One-way ANOVA","2.06e-01","0.687","2.57e-01","0.59","no"
-"5","no","endoplasmic reticulum (ER)","2.99e+03","3.03e+03","3.24e+03","Two-way ANOVA","5.62e+00","1.97e-06","One-way ANOVA","7.46e-01","0.127","7.46e-01","0.127","no"

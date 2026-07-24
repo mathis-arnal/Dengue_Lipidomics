@@ -1,6 +1,0 @@
-"","post.hoc.pval.signif","Category","mean_ctrl","mean_moderate","mean_severe","method","anova.fval","anova.pval","post.hoc.method","post.hoc.pval","post.hoc.mlog10p","post.hoc.padj","post.hoc.mlog10padj","post.hoc.padj.signif"
-"1","yes","Glycerolipids [GL]","5.8e+01","1.21e+02","1.16e+02","Two-way ANOVA","4.78e+00","2.16e-05","One-way ANOVA","3.11e-03","2.51","1.56e-02","1.81","yes"
-"2","yes","Sterol lipids [ST]","3.5e+00","1.61e+00","2.3e+00","Two-way ANOVA","4.78e+00","2.16e-05","One-way ANOVA","2.56e-02","1.59","6.39e-02","1.19","no"
-"3","no","Sphingolipids [SP]","2.94e+02","2.49e+02","2.67e+02","Two-way ANOVA","4.78e+00","2.16e-05","One-way ANOVA","1.72e-01","0.765","2.87e-01","0.543","no"
-"4","no","Fatty acyls [FA]","3.86e+02","5.35e+02","4.12e+02","Two-way ANOVA","4.78e+00","2.16e-05","One-way ANOVA","5.21e-01","0.283","6.51e-01","0.187","no"
-"5","no","Glycerophospholipids [GP]","3.05e+03","3.06e+03","3.29e+03","Two-way ANOVA","4.78e+00","2.16e-05","One-way ANOVA","7.68e-01","0.114","7.68e-01","0.114","no"

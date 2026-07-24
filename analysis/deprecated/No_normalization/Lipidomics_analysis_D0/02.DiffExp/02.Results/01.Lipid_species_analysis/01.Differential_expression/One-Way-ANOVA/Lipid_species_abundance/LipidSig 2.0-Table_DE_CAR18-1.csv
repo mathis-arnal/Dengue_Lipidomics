@@ -1,4 +1,0 @@
-"feature","contrast","method","statistic","pval","post.hoc.method","post.hoc.padj"
-"CAR 18:1","ctrl-moderate","One-way ANOVA","5.465539592251526","0.007971540460821054","Tukey's HSD","0.0158"
-"CAR 18:1","ctrl-severe","One-way ANOVA","5.465539592251526","0.007971540460821054","Tukey's HSD","0.065"
-"CAR 18:1","moderate-severe","One-way ANOVA","5.465539592251526","0.007971540460821054","Tukey's HSD","0.927"

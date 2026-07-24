@@ -1,5 +1,5 @@
 ---
-title: "Lipidomics Analysis Report"
+title: "PBMC Lipidomics Analysis Report"
 subtitle: "Comparative Analysis of Healthy, Mild, and Severe Dengue Patients"
 author: "M. Arnal"
 date: "`r Sys.Date()`"
@@ -34,18 +34,19 @@ library(dplyr)
 
 **A note on normalization:** this dataset passes through two independent, non-redundant normalizations before analysis. First, an ISTD- and cell-count-based normalization (internal-standard-corrected signal divided by each sample's input cell number, from the raw platform data) is a technical/analytical correction applied during data pretreatment, correcting for extraction/ionization efficiency and cell input differences. Second, LipidSigR's `Percentage` normalization (applied in `data_process()`, see Methodology below) is a separate, whole-sample compositional correction applied during analysis, expressing each lipid as a fraction of that sample's total detected lipid signal. The two remove different sources of variation and neither substitutes for the other.
 
-This lipidomics analysis investigates lipid profile alterations associated with dengue disease severity in PBMC samples. Using targeted lipidomics, we analyzed plasma samples from healthy controls and dengue patients classified as mild or severe cases at day 0 (D0) of hospitalization.
+This lipidomics analysis investigates lipid profile alterations associated with dengue disease severity in PBMC samples. Using targeted lipidomics, we analyzed PBMC samples from healthy controls and dengue patients classified as mild or severe cases at day 0 (D0) of hospitalization.
 
 **Key Findings:**
 
 - **Three-group ANOVA** (Healthy vs Mild vs Severe) found **no lipid species significant after FDR correction** (padj < 0.05); only 11 of 110 tested lipids reached nominal significance (p < 0.05), dominated by triglyceride (TG) species
 - **Healthy vs Mild**: 17 lipids nominally significant, but **none survive FDR correction**; nominal trends point to elevated TG species and reduced FA 14:0, with TG the only class reaching significance by over-representation analysis (ORA)
 - **Healthy vs Severe**: only 1 lipid (FA 18:1) nominally significant, and it does not survive FDR correction — the weakest signal of the three pairwise comparisons
-- **Mild vs Severe**: 9 lipids nominally significant, and **one, SM 34:1;O2, survives FDR correction** (padj = 0.047, lower in severe than mild) — the only robust, FDR-significant finding in the entire dataset
+- **Mild vs Severe**: 9 lipids nominally significant, and **one, SM 34:1;O2, survives FDR correction** (padj = 0.047, lower in severe than mild) — the only robust, FDR-significant finding on the canonical cohort
+- **Healthy vs Diseased** (Mild+Severe pooled): 8 lipids nominally significant (all TG species plus FA 18:1 and PC 32:1, all higher in diseased), but **none survive FDR correction** on the canonical 34-patient cohort — though a robustness check on the larger, PBMC-only 57-patient cohort finds **FA 18:1 and PC 32:1 do reach FDR significance** there (padj = 0.042 for both); see Post-Hoc Analysis 4 for the caveats on that unbalanced, non-plasma-matched comparison
 - Unsupervised ordination (PCA, t-SNE, UMAP) shows only partial, overlapping separation between groups; the clearest group separation is seen with supervised PLS-DA in the Mild vs Severe comparison
 - Lipid set enrichment (LSEA) and over-representation (ORA) analyses are largely non-significant across comparisons, with two exceptions: TG class over-representation in Healthy vs Mild, and FA class enrichment in Mild vs Severe
 
-Overall, this dataset shows modest, mostly sub-threshold lipid differences between groups rather than large-scale dysregulation. The single robust finding — reduced SM 34:1;O2 in severe versus mild disease — is a candidate severity marker, but the broader picture is one of limited statistical power (n=9 for severe patients) and considerable inter-sample heterogeneity rather than a clear, dominant biological signature.
+Overall, this dataset shows modest, mostly sub-threshold lipid differences between groups rather than large-scale dysregulation. The clearest robust findings — reduced SM 34:1;O2 in severe versus mild disease on the canonical cohort, and elevated FA 18:1/PC 32:1 in diseased versus healthy on the larger all-patients cohort — are candidate severity markers, but the broader picture is one of limited statistical power (n=8 severe patients with PBMC data, of 9 in the nominal clinical cohort) and considerable inter-sample heterogeneity rather than a clear, dominant biological signature.
 
 ---
 
@@ -71,25 +72,31 @@ These objectives aim to advance our knowledge of the metabolic consequences of d
 
 ## Sample Description
 
-This study included plasma samples from 40 participants, stratified into three groups based on dengue severity status:
+This study included PBMC (peripheral blood mononuclear cell) samples from participants drawn from the same 40-patient cohort used in the plasma lipidomics study, stratified into three groups based on dengue severity status:
 
 ### Cohort Composition
 
-- **Healthy controls (n=20)**: Individuals with no dengue infection, serving as the reference group for baseline lipid profiles  
-- **Mild dengue patients (n=11)**: Patients with confirmed dengue virus infection presenting with mild symptoms not requiring intensive care  
-- **Severe dengue patients (n=9)**: Critically ill patients with confirmed dengue virus infection requiring intensive care management  
+The 40-patient cohort is defined identically to the plasma study for comparability, but PBMC material was not available for every patient in it — see **PBMC Sample Availability** below. Counts here are the nominal cohort; the number actually analyzed in each section is lower and is stated explicitly there.
+
+- **Healthy controls (n=20 nominal / n=15 with PBMC data)**: Individuals with no dengue infection, serving as the reference group for baseline lipid profiles
+- **Mild dengue patients (n=11 nominal / n=11 with PBMC data)**: Patients with confirmed dengue virus infection presenting with mild symptoms not requiring intensive care
+- **Severe dengue patients (n=9 nominal / n=8 with PBMC data)**: Critically ill patients with confirmed dengue virus infection requiring intensive care management
+
+### PBMC Sample Availability
+
+Only **34 of the 40** cohort patients have a matching PBMC abundance measurement (the Three-Group ANOVA and its profiling plots use these 34; each pairwise post-hoc comparison further subsets to its own two groups — see the n stated at the start of each section). The 6 patients present in the clinical cohort but absent from the PBMC dataset are **5 healthy controls** (`BS-129-RAT-10-M5`, `JV-017-RAN-10-M3`, `JV-090-MIN-IC-M4`, `BS-472-RAT-01-M1`, `BS-172-RAT-10-M3`) and **1 severe patient** (`KT-312D0`) — confirmed absent under any naming variant in the PBMC abundance file, not a sample-ID mismatch, consistent with those patients having had insufficient PBMC material collected/processed. This asymmetric dropout (disproportionately healthy controls) is worth keeping in mind when comparing PBMC group sizes against the plasma study's, since it modestly shifts the healthy:mild:severe balance from the plasma cohort's 20:11:9.
 
 ### Sample Collection
 
-- **Timepoint**: Day 0 (D0) - samples collected at the time of hospitalization/diagnosis  
-- **Sample type**: Plasma  
-- **Biospecimen**: Peripheral blood  
+- **Timepoint**: Day 0 (D0) - samples collected at the time of hospitalization/diagnosis
+- **Sample type**: PBMC (peripheral blood mononuclear cells)
+- **Biospecimen**: Peripheral blood
 
 ### Analytical Coverage
 
 - **Total lipid species measured**: 143 lipid species
 - **Lipid recognition rate**: >97% (139/143 species successfully annotated using rgoslin nomenclature)
-- **Lipids retained for statistical analysis**: 110 species passed the 50% detection-frequency filter and were consistently detected (~110 lipids/sample) across all 40 samples
+- **Lipids retained for statistical analysis**: 110 species passed the 50% detection-frequency filter and were consistently detected (~110 lipids/sample) across all 34 samples with PBMC data (of 40 in the nominal cohort)
 - **Major lipid classes represented**:
   - Phosphatidylcholines (PC), Phosphatidylethanolamines (PE), and Lysophosphatidylcholines (LPC)
   - Sphingomyelins (SM) and ceramides (Cer, Hex2Cer)
@@ -102,11 +109,11 @@ This study included plasma samples from 40 participants, stratified into three g
 
 The analysis employed a comprehensive approach:
 
-1. **Three-group comparison** (n=40): One-way ANOVA comparing all groups simultaneously
-2. **Pairwise post-hoc comparisons**:
-   - Healthy vs Mild (n=31)
-   - Healthy vs Severe (n=29)
-   - Mild vs Severe (n=20)
+1. **Three-group comparison** (n=34 analyzed, of n=40 in the nominal clinical cohort — see **PBMC Sample Availability** above): One-way ANOVA comparing all groups simultaneously
+2. **Pairwise post-hoc comparisons** (each re-matched against available PBMC data, so n is lower than the nominal cohort in every case):
+   - Healthy vs Mild (n=26 analyzed, of n=31 nominal)
+   - Healthy vs Severe (n=23 analyzed, of n=29 nominal)
+   - Mild vs Severe (n=19 analyzed, of n=20 nominal)
 
 ## Methodology
 
@@ -149,7 +156,7 @@ The combination of univariate statistics, multivariate dimensionality reduction,
 
 ## Overview
 
-The three-group analysis employs one-way ANOVA to simultaneously compare lipid profiles across healthy controls (n=20), mild dengue patients (n=11), and severe dengue patients (n=9) at day 0 of hospitalization. This global analysis identifies lipid species whose abundance differs significantly across disease severity states, providing an initial overview of lipid dysregulation patterns in dengue infection before conducting detailed pairwise comparisons.
+The three-group analysis employs one-way ANOVA to simultaneously compare lipid profiles across healthy controls (n=15 with PBMC data, of 20 nominal), mild dengue patients (n=11), and severe dengue patients (n=8, of 9 nominal) at day 0 of hospitalization — 34 samples total. This global analysis identifies lipid species whose abundance differs significantly across disease severity states, providing an initial overview of lipid dysregulation patterns in dengue infection before conducting detailed pairwise comparisons.
 
 This section presents the results of the one-way ANOVA comparing lipid profiles across all three groups simultaneously.
 
@@ -196,7 +203,7 @@ include_graphics("PBMC/Three_groups/D0/01.Profiling/01.Cross-sample_variability/
 
 **Cross-Sample Variability Assessment:**
 
-- **Number of expressed lipids** is highly consistent across all 40 samples: essentially all samples detect ~110 of the 110 filtered lipid species, with no group showing systematically lower coverage. This confirms that detection depth is not confounded with disease group.
+- **Number of expressed lipids** is highly consistent across all 34 samples: essentially all samples detect ~110 of the 110 filtered lipid species, with no group showing systematically lower coverage. This confirms that detection depth is not confounded with disease group.
 - **Total lipid abundance per sample**, in contrast, is far from uniform: most samples sum to under 500 abundance units, but a handful of samples (KT-539D0 ~4000, BS-364D0 ~2900, KT-695D0 ~1500, BS-082D0 and BS-356-RAN-03-M4 ~1000-1100) are 2-8x higher than the rest. These same samples reappear as the outliers in the quality-control boxplots above.
 - **Lipid abundance distribution** (log10 scale) is broadly overlapping across samples, aside from the same outlier samples showing distinct peak positions.
 
@@ -349,7 +356,7 @@ include_graphics("PBMC/Three_groups/D0/01.Profiling/04.Lipid_characteristics/Lip
 
 **Lipid Class Composition Analysis:**
 
-The stacked bar chart displays the relative proportions of 13 lipid classes across all 40 samples. In this dataset:
+The stacked bar chart displays the relative proportions of 13 lipid classes across all 34 samples. In this dataset:
 
 - **PE, PC, SM, and FA** are the dominant classes, together typically accounting for the majority of each sample's composition
 - **LPC** is a minor component in every sample (a thin band), with no visually obvious, uniform elevation pattern distinguishing any one group from another
@@ -421,9 +428,7 @@ boxplot_files <- list.files("PBMC/Three_groups/D0/02.DiffExp/03.Individual_lipid
 )
 if (length(boxplot_files) > 0) {
   n_plots <- min(10, length(boxplot_files))
-  for (i in seq_len(n_plots)) {
-    knitr::include_graphics(boxplot_files[i])
-  }
+  knitr::include_graphics(boxplot_files[seq_len(n_plots)])
 }
 ```
 
@@ -517,7 +522,7 @@ This means the species-level Percentage-normalized results above are indeed disc
 
 ## Overview
 
-This pairwise comparison focuses on lipid changes occurring in the early stages of dengue disease by comparing healthy controls (n=20) with mild dengue patients (n=11) at D0. Of 110 lipids tested, 17 are nominally significant (p<0.05), but **none survive FDR correction** — so any conclusions from this comparison should be treated as exploratory trends rather than confirmed biomarkers.
+This pairwise comparison focuses on lipid changes occurring in the early stages of dengue disease by comparing healthy controls (n=15, of 20 nominal) with mild dengue patients (n=11) at D0 — 26 matched samples total. Of 110 lipids tested, 17 are nominally significant (p<0.05), but **none survive FDR correction** — so any conclusions from this comparison should be treated as exploratory trends rather than confirmed biomarkers.
 
 ## Data Quality and Profiling
 
@@ -530,7 +535,7 @@ include_graphics("PBMC/PostHoc_Healthy_vs_Mild/D0/01.Profiling/00.Data_quality/D
 
 **Data Quality Assessment:**
 
-As in the three-group analysis, normalization tightens most sample distributions into a consistent interquartile range (roughly -9 to -7 on the log10 scale) across the 31 samples (20 healthy + 11 mild). However, the same outlier samples reappear here: **BS-082D0, BS-364D0, KT-663D0, KT-695D0, BS-356-RAN-03-M4, BS-007-RAN-02-M3, and JV-070-MIN-01-M1** show much wider post-processing spread than the rest of the cohort, indicating residual sample-level heterogeneity that normalization did not fully remove.
+As in the three-group analysis, normalization tightens most sample distributions into a consistent interquartile range (roughly -9 to -7 on the log10 scale) across the 26 samples (15 healthy + 11 mild). However, the same outlier samples reappear here: **BS-082D0, BS-364D0, KT-663D0, KT-695D0, BS-356-RAN-03-M4, BS-007-RAN-02-M3, and JV-070-MIN-01-M1** show much wider post-processing spread than the rest of the cohort, indicating residual sample-level heterogeneity that normalization did not fully remove.
 
 ### Dimensionality Reduction
 
@@ -541,7 +546,25 @@ pca_plot <- readRDS("PBMC/PostHoc_Healthy_vs_Mild/D0/01.Profiling/02.Dimensional
 pca_plot
 ```
 
-**PCA Results:** PC1 and PC2 explain 43.5% and 18.1% of variance, respectively. The mild-patient ellipse is small and compact, centered just right of the origin, while the healthy-control ellipse is much more elongated along the PC1-PC2 diagonal — driven by a few outlier healthy samples rather than a uniform group shift. The two ellipses overlap substantially near the origin, indicating that most mild and healthy samples are not well separated on the first two components.
+**What "Groups" 1/2 mean in this plot:** as in the Three-Group Analysis above, `dr_pca()` was called with `clustering = "kmeans", cluster_num = 2` — the "Groups" legend is an **unsupervised k-means clustering fit on the PCA-reduced data**, not the healthy/mild labels.
+
+```{r healthy-mild-pca-cluster-check}
+pca_table <- read.delim("PBMC/PostHoc_Healthy_vs_Mild/D0/01.Profiling/02.Dimensionality_reduction/PCA/table_pca_rotated_data.tsv")
+group_info_hm <- read.delim("../data/PBMC/group_information_table_healthy_vs_MILD_D0.tsv")
+
+hm_pca_cluster_vs_severity <- pca_table %>%
+  dplyr::select(sample_name, kmeans_cluster = group) %>%
+  dplyr::left_join(group_info_hm %>% dplyr::select(sample_name, severity = group), by = "sample_name") %>%
+  dplyr::count(kmeans_cluster, severity) %>%
+  tidyr::pivot_wider(names_from = severity, values_from = n, values_fill = 0)
+
+kable(hm_pca_cluster_vs_severity,
+  caption = "k-means cluster (PCA \"Groups\" legend) vs. true severity group"
+) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, font_size = 12)
+```
+
+**PCA Results:** PC1 and PC2 explain 43.5% and 18.1% of variance, respectively. Cross-tabulating the k-means clusters against true labels (table above, 26 matched samples: 15 healthy, 11 mild) shows a weak tendency rather than a clean split: cluster 1 (22 of 26 samples: 14 healthy/8 mild) is close to the overall cohort mix, while cluster 2 is small (4 samples: 1 healthy/3 mild) and mild-skewed but too small to be more than a hint. The "compact" and "elongated" shapes visible in the plot correspond to these two unequal-sized clusters, not to clean healthy/mild groupings — most of both groups fall into the same cluster.
 
 ```{r healthy-mild-scree}
 scree_plot <- readRDS("PBMC/PostHoc_Healthy_vs_Mild/D0/01.Profiling/02.Dimensionality_reduction/PCA/Scree_plot_interactive.rds")
@@ -557,7 +580,7 @@ variable_correlation_plot
 
 **PCA Interpretation for Healthy vs Mild:**
 
-The elongated healthy ellipse, rather than a tight one, suggests that PC1/PC2 in this comparison are picking up **within-healthy-group heterogeneity** as much as any healthy-vs-mild difference. This is consistent with the lack of any FDR-significant lipid between these two groups.
+Because the two k-means clusters do not correspond cleanly to healthy/mild status (table above), the larger cluster's spread most likely reflects **general sample heterogeneity** rather than a healthy-vs-mild axis specifically. This is consistent with the lack of any FDR-significant lipid between these two groups.
 
 #### t-SNE
 
@@ -566,9 +589,26 @@ tsne_plot <- readRDS("PBMC/PostHoc_Healthy_vs_Mild/D0/01.Profiling/02.Dimensiona
 tsne_plot
 ```
 
+**As above, "Groups" 1/2 here are k-means clusters fit on the t-SNE embedding, not the healthy/mild labels.**
+
+```{r healthy-mild-tsne-cluster-check}
+tsne_table <- read.delim("PBMC/PostHoc_Healthy_vs_Mild/D0/01.Profiling/02.Dimensionality_reduction/t-SNE/table_tsne_results.tsv")
+
+hm_tsne_cluster_vs_severity <- tsne_table %>%
+  dplyr::select(sample_name, kmeans_cluster = group) %>%
+  dplyr::left_join(group_info_hm %>% dplyr::select(sample_name, severity = group), by = "sample_name") %>%
+  dplyr::count(kmeans_cluster, severity) %>%
+  tidyr::pivot_wider(names_from = severity, values_from = n, values_fill = 0)
+
+kable(hm_tsne_cluster_vs_severity,
+  caption = "k-means cluster (t-SNE \"Groups\" legend) vs. true severity group"
+) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, font_size = 12)
+```
+
 **t-SNE Interpretation:**
 
-Healthy controls form a small, tight cluster in the upper-left of the plot, while mild patients spread broadly across the remaining space with a moderate overlap with the healthy ellipse. Mild samples show more spread than healthy samples in this projection — the opposite pattern from PCA — which is more indicative of general heterogeneity in the mild group than of a clean, separable disease signature.
+Cluster 1 (16 samples: 11 healthy/5 mild, 69%/31%) skews healthy and cluster 2 (10 samples: 4 healthy/6 mild, 40%/60%) skews mild — a real but partial tendency, not a clean separation. This is a weaker, noisier version of the PCA pattern above rather than a distinct, more informative one.
 
 #### UMAP
 
@@ -577,9 +617,26 @@ umap_plot <- readRDS("PBMC/PostHoc_Healthy_vs_Mild/D0/01.Profiling/02.Dimensiona
 umap_plot
 ```
 
+**Again, "Groups" 1/2 here are k-means clusters fit on the UMAP embedding, not the healthy/mild labels.**
+
+```{r healthy-mild-umap-cluster-check}
+umap_table <- read.delim("PBMC/PostHoc_Healthy_vs_Mild/D0/01.Profiling/02.Dimensionality_reduction/UMAP/UMAP_results.tsv")
+
+hm_umap_cluster_vs_severity <- umap_table %>%
+  dplyr::select(sample_name, kmeans_cluster = group) %>%
+  dplyr::left_join(group_info_hm %>% dplyr::select(sample_name, severity = group), by = "sample_name") %>%
+  dplyr::count(kmeans_cluster, severity) %>%
+  tidyr::pivot_wider(names_from = severity, values_from = n, values_fill = 0)
+
+kable(hm_umap_cluster_vs_severity,
+  caption = "k-means cluster (UMAP \"Groups\" legend) vs. true severity group"
+) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, font_size = 12)
+```
+
 **UMAP Interpretation:**
 
-Healthy and mild ellipses partially overlap, with healthy samples concentrated in the lower half and mild samples in the upper half, but a clear band of overlap in the middle where both groups intermix. This partial, non-absolute separation is consistent across all three ordination methods (PCA, t-SNE, UMAP) and agrees with the absence of FDR-significant lipids between these two groups.
+This is the clearest separation of the three ordination methods for this comparison: cluster 1 (12 samples: 4 healthy/8 mild) captures 8 of the cohort's 11 mild patients (73%), while cluster 2 (14 samples: 11 healthy/3 mild) captures 11 of its 15 healthy controls (73%). Still an imperfect, overlapping split rather than a clean one, but a real directional tendency — consistent with mild dengue producing the most (if still modest) PBMC-lipidome shift of the three severity contrasts tested in this report.
 
 ### Correlation Analysis
 
@@ -712,9 +769,7 @@ boxplot_files <- list.files("PBMC/PostHoc_Healthy_vs_Mild/D0/02.DiffExp/03.Indiv
 )
 if (length(boxplot_files) > 0) {
   n_plots <- min(10, length(boxplot_files))
-  for (i in seq_len(n_plots)) {
-    knitr::include_graphics(boxplot_files[i])
-  }
+  knitr::include_graphics(boxplot_files[seq_len(n_plots)])
 }
 ```
 
@@ -758,7 +813,7 @@ include_graphics("PBMC/PostHoc_Healthy_vs_Mild/D0/03.Enrichment/ORA/ORA_by_categ
 
 ## Overview
 
-This comparison examines lipid alterations in severe dengue patients (n=9) relative to healthy controls (n=20) at D0. Of the three pairwise comparisons in this report, this one shows the **weakest signal**: only 1 of 110 tested lipids (FA 18:1) is even nominally significant, and it does not survive FDR correction. This likely reflects, at least in part, the small severe-patient sample size (n=9), which limits statistical power.
+This comparison examines lipid alterations in severe dengue patients (n=8, of 9 nominal) relative to healthy controls (n=15, of 20 nominal) at D0 — 23 matched samples total. Of the three pairwise comparisons in this report, this one shows the **weakest signal**: only 1 of 110 tested lipids (FA 18:1) is even nominally significant, and it does not survive FDR correction. This likely reflects, at least in part, the small severe-patient sample size (n=8 with PBMC data), which limits statistical power.
 
 ## Data Quality and Profiling
 
@@ -769,7 +824,7 @@ include_graphics("PBMC/PostHoc_Healthy_vs_Severe/D0/01.Profiling/00.Data_quality
 include_graphics("PBMC/PostHoc_Healthy_vs_Severe/D0/01.Profiling/00.Data_quality/Data_quality_boxplot_after.png")
 ```
 
-**Data Quality:** Normalization of the 29 samples (20 healthy + 9 severe) tightens most distributions to a consistent range, but the same outlier samples seen in the other comparisons — **KT-417D0, KT-705D0, BS-007-RAN-02-M3, BS-356-RAN-03-M4, and JV-070-MIN-01-M1** — again show much wider post-processing spread than the rest of the cohort.
+**Data Quality:** Normalization of the 23 samples (15 healthy + 8 severe) tightens most distributions to a consistent range, but the same outlier samples seen in the other comparisons — **KT-417D0, KT-705D0, BS-007-RAN-02-M3, BS-356-RAN-03-M4, and JV-070-MIN-01-M1** — again show much wider post-processing spread than the rest of the cohort.
 
 ### Dimensionality Reduction
 
@@ -780,7 +835,25 @@ pca_plot <- readRDS("PBMC/PostHoc_Healthy_vs_Severe/D0/01.Profiling/02.Dimension
 pca_plot
 ```
 
-**PCA Analysis:** PC1 and PC2 explain 50% and 19.6% of variance, respectively. The healthy-control ellipse is a narrow vertical band near Dim1 = 0, while the severe-patient ellipse is a wide horizontal band that **almost entirely overlaps** the healthy ellipse — except for one severe sample that is a clear outlier at high Dim1 (~+33). This is the least-separated PCA of the three pairwise comparisons, consistent with Healthy vs Severe showing the weakest statistical signal.
+**What "Groups" 1/2 mean:** as elsewhere in this report, `dr_pca()` was called with `clustering = "kmeans", cluster_num = 2` — the "Groups" legend is an unsupervised k-means clustering, not the healthy/severe labels.
+
+```{r healthy-severe-pca-cluster-check}
+pca_table <- read.delim("PBMC/PostHoc_Healthy_vs_Severe/D0/01.Profiling/02.Dimensionality_reduction/PCA/table_pca_rotated_data.tsv")
+group_info_hs <- read.delim("../data/PBMC/group_information_table_healthy_vs_SEVERE_D0.tsv")
+
+hs_pca_cluster_vs_severity <- pca_table %>%
+  dplyr::select(sample_name, kmeans_cluster = group) %>%
+  dplyr::left_join(group_info_hs %>% dplyr::select(sample_name, severity = group), by = "sample_name") %>%
+  dplyr::count(kmeans_cluster, severity) %>%
+  tidyr::pivot_wider(names_from = severity, values_from = n, values_fill = 0)
+
+kable(hs_pca_cluster_vs_severity,
+  caption = "k-means cluster (PCA \"Groups\" legend) vs. true severity group"
+) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, font_size = 12)
+```
+
+**PCA Analysis:** PC1 and PC2 explain 50% and 19.6% of variance, respectively. Only 23 of the 29 nominal patients have matching PBMC data here (15 healthy, 8 severe — see Sample Description). Cross-tabulating clusters against true labels (table above) shows **essentially no separation**: cluster 1 holds 22 of 23 samples (14 healthy/8 severe — i.e. *all* severe patients and all but one healthy control), while cluster 2 is a single sample. That lone cluster-2 sample is **`BS-007-RAN-02-M3`, a healthy control**, not a severe patient — it is the same recurring quality-control outlier flagged throughout this report, not a severe-patient signature. This is the least-separated PCA of the three pairwise comparisons, consistent with Healthy vs Severe showing the weakest statistical signal.
 
 ```{r healthy-severe-scree}
 scree_plot <- readRDS("PBMC/PostHoc_Healthy_vs_Severe/D0/01.Profiling/02.Dimensionality_reduction/PCA/Scree_plot_interactive.rds")
@@ -803,7 +876,24 @@ tsne_plot <- readRDS("PBMC/PostHoc_Healthy_vs_Severe/D0/01.Profiling/02.Dimensio
 tsne_plot
 ```
 
-**t-SNE:** As with PCA, expect substantial overlap between healthy and severe samples rather than clean separation, consistent with only 1 lipid reaching even nominal significance in this comparison.
+**"Groups" 1/2 here are k-means clusters fit on the t-SNE embedding, not the healthy/severe labels.**
+
+```{r healthy-severe-tsne-cluster-check}
+tsne_table <- read.delim("PBMC/PostHoc_Healthy_vs_Severe/D0/01.Profiling/02.Dimensionality_reduction/t-SNE/table_tsne_results.tsv")
+
+hs_tsne_cluster_vs_severity <- tsne_table %>%
+  dplyr::select(sample_name, kmeans_cluster = group) %>%
+  dplyr::left_join(group_info_hs %>% dplyr::select(sample_name, severity = group), by = "sample_name") %>%
+  dplyr::count(kmeans_cluster, severity) %>%
+  tidyr::pivot_wider(names_from = severity, values_from = n, values_fill = 0)
+
+kable(hs_tsne_cluster_vs_severity,
+  caption = "k-means cluster (t-SNE \"Groups\" legend) vs. true severity group"
+) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, font_size = 12)
+```
+
+**t-SNE:** Cluster 1 (11 samples: 7 healthy/4 severe, 64%/36%) and cluster 2 (12 samples: 8 healthy/4 severe, 67%/33%) have almost identical composition — no separation, consistent with only 1 lipid reaching even nominal significance in this comparison.
 
 #### UMAP
 
@@ -812,7 +902,24 @@ umap_plot <- readRDS("PBMC/PostHoc_Healthy_vs_Severe/D0/01.Profiling/02.Dimensio
 umap_plot
 ```
 
-**UMAP:** Healthy samples occupy mostly the lower half of the plot and severe samples the upper half, but with a wide overlap band in the middle where several samples from both groups intermix — partial, not clean, separation.
+**"Groups" 1/2 here are k-means clusters fit on the UMAP embedding, not the healthy/severe labels.**
+
+```{r healthy-severe-umap-cluster-check}
+umap_table <- read.delim("PBMC/PostHoc_Healthy_vs_Severe/D0/01.Profiling/02.Dimensionality_reduction/UMAP/UMAP_results.tsv")
+
+hs_umap_cluster_vs_severity <- umap_table %>%
+  dplyr::select(sample_name, kmeans_cluster = group) %>%
+  dplyr::left_join(group_info_hs %>% dplyr::select(sample_name, severity = group), by = "sample_name") %>%
+  dplyr::count(kmeans_cluster, severity) %>%
+  tidyr::pivot_wider(names_from = severity, values_from = n, values_fill = 0)
+
+kable(hs_umap_cluster_vs_severity,
+  caption = "k-means cluster (UMAP \"Groups\" legend) vs. true severity group"
+) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, font_size = 12)
+```
+
+**UMAP:** Cluster 1 (13 samples: 9 healthy/4 severe, 69%/31%) and cluster 2 (10 samples: 6 healthy/4 severe, 60%/40%) are only marginally different from the cohort's overall 65%/35% healthy/severe split — a negligible skew, not a meaningful separation. Of the three ordination methods, none shows evidence that Healthy vs Severe PBMC lipid profiles separate.
 
 ### Correlation Analysis
 
@@ -862,7 +969,7 @@ kable(ttest_results,
 
 Of 110 lipids tested, only **one** — **FA 18:1** — is even nominally significant (p ≈ 0.012), showing a large apparent fold-change (log2FC ≈ 3.1, roughly 9-fold higher in severe patients) but a high FDR-adjusted p-value (padj ≈ 0.74) that does not survive correction.
 
-**Interpretation:** This is the weakest result of the three pairwise comparisons — with a severe-patient group of only n=9, statistical power is limited, and this analysis simply does not detect a reproducible, group-wide lipid signature distinguishing severe dengue from healthy controls in this dataset. A single nominal hit (FA 18:1) is not sufficient to support claims about specific pathways (e.g., PLA2 activation, arachidonic acid metabolism) being altered in severe disease; larger severe-patient cohorts would be needed to test that possibility.
+**Interpretation:** This is the weakest result of the three pairwise comparisons — with a severe-patient group of only n=8 (with PBMC data), statistical power is limited, and this analysis simply does not detect a reproducible, group-wide lipid signature distinguishing severe dengue from healthy controls in this dataset. A single nominal hit (FA 18:1) is not sufficient to support claims about specific pathways (e.g., PLA2 activation, arachidonic acid metabolism) being altered in severe disease; larger severe-patient cohorts would be needed to test that possibility.
 
 ### Visualization
 
@@ -927,9 +1034,7 @@ boxplot_files <- list.files("PBMC/PostHoc_Healthy_vs_Severe/D0/02.DiffExp/03.Ind
 # Display first 10 boxplots
 if (length(boxplot_files) > 0) {
   n_plots <- min(10, length(boxplot_files))
-  for (i in seq_len(n_plots)) {
-    knitr::include_graphics(boxplot_files[i])
-  }
+  knitr::include_graphics(boxplot_files[seq_len(n_plots)])
 }
 ```
 
@@ -965,7 +1070,7 @@ include_graphics("PBMC/PostHoc_Healthy_vs_Severe/D0/03.Enrichment/ORA/ORA_by_cat
 
 ## Overview
 
-This comparison directly contrasts mild (n=11) and severe (n=9) dengue patients at D0, both groups being infected with dengue virus, and focuses on severity-related lipid changes rather than infection-vs-healthy differences. Of the three pairwise comparisons in this report, **this is the only one that yields an FDR-significant lipid**: SM 34:1;O2 is significantly lower in severe than in mild disease (padj = 0.047). 9 of 110 lipids are nominally significant overall, and this comparison also shows the clearest group separation by supervised PLS-DA of the three comparisons.
+This comparison directly contrasts mild (n=11) and severe (n=8, of 9 nominal) dengue patients at D0 — 19 matched samples total — both groups being infected with dengue virus, and focuses on severity-related lipid changes rather than infection-vs-healthy differences. Of the three pairwise comparisons in this report, **this is the only one that yields an FDR-significant lipid**: SM 34:1;O2 is significantly lower in severe than in mild disease (padj = 0.047). 9 of 110 lipids are nominally significant overall, and this comparison also shows the clearest group separation by supervised PLS-DA of the three comparisons.
 
 **Note:** the quality-control, correlation-heatmap, and lipid-composition plots under the Profiling subsection below list healthy-control sample IDs (KT-*) rather than mild/severe patient IDs — this appears to be a labeling artifact in the pipeline's profiling step for this comparison. The differential expression results (t-test, PLS-DA, volcano) described further down do use the correct mild-vs-severe sample groups.
 
@@ -989,7 +1094,25 @@ pca_plot <- readRDS("PBMC/PostHoc_Mild_vs_Severe/D0/01.Profiling/02.Dimensionali
 pca_plot
 ```
 
-**PCA for Severity Discrimination:** PC1 and PC2 explain 40.1% and 18% of variance. The mild and severe ellipses overlap substantially along a shared diagonal axis, with one mild sample as a clear outlier at high PC1/PC2. As with the other comparisons, PCA alone does not cleanly separate the two groups — the clearer separation for this comparison comes from the supervised PLS-DA shown later in this section.
+**What "Groups" 1/2 mean:** as elsewhere in this report, `dr_pca()` was called with `clustering = "kmeans", cluster_num = 2` — the "Groups" legend is an unsupervised k-means clustering, not the mild/severe labels.
+
+```{r mild-severe-pca-cluster-check}
+pca_table <- read.delim("PBMC/PostHoc_Mild_vs_Severe/D0/01.Profiling/02.Dimensionality_reduction/PCA/table_pca_rotated_data.tsv")
+group_info_ms <- read.delim("../data/PBMC/group_information_table_MILD_vs_SEVERE_patients_D0.tsv")
+
+ms_pca_cluster_vs_severity <- pca_table %>%
+  dplyr::select(sample_name, kmeans_cluster = group) %>%
+  dplyr::left_join(group_info_ms %>% dplyr::select(sample_name, severity = group), by = "sample_name") %>%
+  dplyr::count(kmeans_cluster, severity) %>%
+  tidyr::pivot_wider(names_from = severity, values_from = n, values_fill = 0)
+
+kable(ms_pca_cluster_vs_severity,
+  caption = "k-means cluster (PCA \"Groups\" legend) vs. true severity group"
+) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, font_size = 12)
+```
+
+**PCA for Severity Discrimination:** PC1 and PC2 explain 40.1% and 18% of variance. Cross-tabulating clusters against true labels (table above, 19 matched samples: 11 mild, 8 severe) shows a modest skew: cluster 1 is small (5 samples: 4 mild/1 severe, 80% mild) while cluster 2 (14 samples: 7 mild/7 severe) is an even split. As with the other comparisons, PCA alone does not cleanly separate the two groups — the clearer separation for this comparison comes from the supervised PLS-DA shown later in this section.
 
 ```{r mild-severe-scree}
 scree_plot <- readRDS("PBMC/PostHoc_Mild_vs_Severe/D0/01.Profiling/02.Dimensionality_reduction/PCA/Scree_plot_interactive.rds")
@@ -1003,7 +1126,7 @@ variable_correlation_plot <- readRDS("PBMC/PostHoc_Mild_vs_Severe/D0/01.Profilin
 variable_correlation_plot
 ```
 
-**Variable Correlation:** Shows lipid loadings on PC1/PC2 for this comparison; given the overlapping PCA ellipses, these are best treated as descriptive rather than confirmed severity markers on their own.
+**Variable Correlation:** Shows lipid loadings on PC1/PC2 for this comparison; given the overlapping PCA clusters, these are best treated as descriptive rather than confirmed severity markers on their own.
 
 #### t-SNE
 
@@ -1012,7 +1135,24 @@ tsne_plot <- readRDS("PBMC/PostHoc_Mild_vs_Severe/D0/01.Profiling/02.Dimensional
 tsne_plot
 ```
 
-**t-SNE:** As with PCA, expect partial overlap between mild and severe samples in this unsupervised, non-linear projection.
+**"Groups" 1/2 here are k-means clusters fit on the t-SNE embedding, not the mild/severe labels.**
+
+```{r mild-severe-tsne-cluster-check}
+tsne_table <- read.delim("PBMC/PostHoc_Mild_vs_Severe/D0/01.Profiling/02.Dimensionality_reduction/t-SNE/table_tsne_results.tsv")
+
+ms_tsne_cluster_vs_severity <- tsne_table %>%
+  dplyr::select(sample_name, kmeans_cluster = group) %>%
+  dplyr::left_join(group_info_ms %>% dplyr::select(sample_name, severity = group), by = "sample_name") %>%
+  dplyr::count(kmeans_cluster, severity) %>%
+  tidyr::pivot_wider(names_from = severity, values_from = n, values_fill = 0)
+
+kable(ms_tsne_cluster_vs_severity,
+  caption = "k-means cluster (t-SNE \"Groups\" legend) vs. true severity group"
+) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, font_size = 12)
+```
+
+**t-SNE:** Cluster 1 (9 samples: 7 mild/2 severe, 78%/22%) skews mild and cluster 2 (10 samples: 4 mild/6 severe, 40%/60%) skews severe — the clearest unsupervised separation of the three pairwise comparisons, matching this comparison being the only one with an FDR-significant lipid, though still a partial rather than clean split.
 
 #### UMAP
 
@@ -1021,7 +1161,24 @@ umap_plot <- readRDS("PBMC/PostHoc_Mild_vs_Severe/D0/01.Profiling/02.Dimensional
 umap_plot
 ```
 
-**UMAP:** Provides another unsupervised view; as with PCA and t-SNE, expect partial rather than absolute separation. The clean separation between mild and severe seen later in this section comes specifically from the supervised PLS-DA method, which is trained to maximize group separation — an important distinction from the unsupervised methods shown here.
+**"Groups" 1/2 here are k-means clusters fit on the UMAP embedding, not the mild/severe labels.**
+
+```{r mild-severe-umap-cluster-check}
+umap_table <- read.delim("PBMC/PostHoc_Mild_vs_Severe/D0/01.Profiling/02.Dimensionality_reduction/UMAP/UMAP_results.tsv")
+
+ms_umap_cluster_vs_severity <- umap_table %>%
+  dplyr::select(sample_name, kmeans_cluster = group) %>%
+  dplyr::left_join(group_info_ms %>% dplyr::select(sample_name, severity = group), by = "sample_name") %>%
+  dplyr::count(kmeans_cluster, severity) %>%
+  tidyr::pivot_wider(names_from = severity, values_from = n, values_fill = 0)
+
+kable(ms_umap_cluster_vs_severity,
+  caption = "k-means cluster (UMAP \"Groups\" legend) vs. true severity group"
+) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, font_size = 12)
+```
+
+**UMAP:** Produces the identical cluster split as t-SNE above (cluster 1: 7 mild/2 severe; cluster 2: 4 mild/6 severe) — a consistent, if partial, mild-vs-severe tendency across both non-linear methods. The clean separation seen later in this section comes specifically from the supervised PLS-DA method, which is trained to maximize group separation — an important distinction from the unsupervised methods shown here, though these two do show more directional agreement with severity than either Healthy vs Mild or Healthy vs Severe achieved.
 
 ### Correlation Analysis
 
@@ -1079,7 +1236,7 @@ Of 110 lipids tested, 9 are nominally significant (p < 0.05). **One, SM 34:1;O2,
 - SM 40:1;O2 — lower in severe (largest negative fold-change)
 - PC 36:2 — lower in severe (weakest of the nominal hits)
 
-**Interpretation:** Three of the 9 nominal hits are sphingomyelin (SM) species, all decreasing with severity, and several PC species plus cholesterol also trend down in severe disease. This is a more coherent, single-direction pattern than seen in the other two comparisons, and — together with SM 34:1;O2 being the only lipid to survive FDR correction anywhere in this study — makes SM 34:1;O2 the most credible severity-associated candidate marker in this dataset, though it is based on a single comparison with modest sample sizes (n=11 mild, n=9 severe) and should be validated in an independent cohort before further interpretation.
+**Interpretation:** Three of the 9 nominal hits are sphingomyelin (SM) species, all decreasing with severity, and several PC species plus cholesterol also trend down in severe disease. This is a more coherent, single-direction pattern than seen in the other two comparisons, and — together with SM 34:1;O2 being the only lipid to survive FDR correction anywhere in this study — makes SM 34:1;O2 the most credible severity-associated candidate marker in this dataset, though it is based on a single comparison with modest sample sizes (n=11 mild, n=8 severe) and should be validated in an independent cohort before further interpretation.
 
 ### Visualization
 
@@ -1142,20 +1299,30 @@ include_graphics("PBMC/PostHoc_Mild_vs_Severe/D0/02.DiffExp/02.Visualizations/de
 ### Individual Lipid Boxplots
 
 ```{r mild-severe-boxplots, results='asis', fig.show='hold', out.width='50%'}
-# List top 10 significant lipids
 boxplot_files <- list.files("PBMC/PostHoc_Mild_vs_Severe/D0/02.DiffExp/03.Individual_lipid_boxplots",
   pattern = "*.png", full.names = TRUE
 )
-# Display first 10 boxplots
 if (length(boxplot_files) > 0) {
-  n_plots <- min(10, length(boxplot_files))
-  for (i in seq_len(n_plots)) {
-    knitr::include_graphics(boxplot_files[i])
-  }
+  knitr::include_graphics(boxplot_files)
 }
 ```
 
-**Individual Severity Biomarkers:** A single individual lipid boxplot was generated for this comparison — **SM 34:1;O2**, the sole FDR-significant lipid (padj = 0.047). The boxplot shows mild-patient values mostly between ~10-25 (log10 abundance scale) with a median around 16, versus severe-patient values mostly between ~5-15 with a median around 8 — a visually clear downward shift with severity, though with some overlap between the two groups (the lowest mild values and highest severe values are close). No other individual boxplots were generated, since no other lipid in this study reached FDR significance.
+**Individual Severity Biomarkers:** All 11 lipids nominally significant in this comparison are shown above (sorted by significance), not just **SM 34:1;O2**, the sole FDR-significant one (padj = 0.047). SM 34:1;O2's boxplot shows mild-patient values mostly between ~10-25 (log10 abundance scale) with a median around 16, versus severe-patient values mostly between ~5-15 with a median around 8 — a visually clear downward shift with severity, though with some overlap between the two groups (the lowest mild values and highest severe values are close). None of the other 10 survive FDR correction.
+
+### Three-Group Comparison (Healthy Included)
+
+The boxplots above only show mild and severe, the two groups actually tested — PBMC_04's underlying data never includes healthy samples. For context, the same 11 lipids are plotted below using the three-group (healthy/mild/severe) processed data instead, so healthy can be visually compared alongside the tested mild-vs-severe difference. **The significance bracket shown is still the Mild-vs-Severe t-test result** — healthy is included for visual reference only and was not part of this comparison's statistical test.
+
+```{r mild-severe-boxplots-3group, results='asis', fig.show='hold', out.width='50%'}
+boxplot_files_3group <- list.files("PBMC/PostHoc_Mild_vs_Severe/D0/02.DiffExp/03.Individual_lipid_boxplots_with_healthy",
+  pattern = "*.png", full.names = TRUE
+)
+if (length(boxplot_files_3group) > 0) {
+  knitr::include_graphics(boxplot_files_3group)
+}
+```
+
+For most of these 11 lipids, healthy sits closer to mild than to severe (consistent with the general pattern established throughout this report — healthy-vs-severe is the weakest PBMC contrast, healthy-vs-mild the closest to *some* signal), though there are exceptions worth a closer look (e.g. lipids where healthy sits outside the mild-severe range entirely, or tracks with severe instead of mild) — worth inspecting directly rather than assuming the pattern is uniform across all 11.
 
 ## Enrichment Analysis
 
@@ -1183,20 +1350,389 @@ include_graphics("PBMC/PostHoc_Mild_vs_Severe/D0/03.Enrichment/ORA/ORA_by_catego
 
 ---
 
+# Post-Hoc Analysis 4: Healthy vs Diseased (Mild + Severe Pooled)
+
+## Overview
+
+This comparison pools mild and severe patients into a single "diseased" group and contrasts them against healthy controls — the test PBMC_02 (Healthy vs Mild) and PBMC_03 (Healthy vs Severe) don't directly answer on their own, since pooling changes statistical power (a larger, more balanced n per group) and can reveal a signal neither sub-comparison was powered to detect alone. It uses the same canonical cohort as the rest of this report: **n=34 analyzed (15 healthy, 19 diseased), of 40 in the nominal cohort** (see **PBMC Sample Availability** above). Of 121 lipids tested, 8 are nominally significant (p<0.05), but **none survive FDR correction** — consistent with every other pairwise comparison except Mild vs Severe.
+
+## Data Quality and Profiling
+
+### Quality Assessment
+
+```{r healthy-diseased-quality}
+include_graphics("PBMC/PostHoc_Healthy_vs_Diseased/D0/01.Profiling/00.Data_quality/Data_quality_boxplot_before.png")
+include_graphics("PBMC/PostHoc_Healthy_vs_Diseased/D0/01.Profiling/00.Data_quality/Data_quality_boxplot_after.png")
+```
+
+**Data Quality:** Normalization of the 34 samples (15 healthy + 19 diseased) tightens most distributions to a consistent range, but the same recurring outlier samples flagged throughout this report — **BS-082D0, BS-364D0, KT-417D0, KT-705D0, BS-356-RAN-03-M4, BS-007-RAN-02-M3, and JV-070-MIN-01-M1** — again show much wider (or, for BS-007-RAN-02-M3, shifted) post-processing spread than the rest of the cohort.
+
+### Dimensionality Reduction
+
+#### PCA
+
+```{r healthy-diseased-pca}
+pca_plot <- readRDS("PBMC/PostHoc_Healthy_vs_Diseased/D0/01.Profiling/02.Dimensionality_reduction/PCA/PCA_plot_interactive.rds")
+pca_plot
+```
+
+**What "Groups" 1/2 mean:** as elsewhere in this report, `dr_pca()` was called with `clustering = "kmeans", cluster_num = 2` — the "Groups" legend is an unsupervised k-means clustering, not the healthy/diseased labels.
+
+```{r healthy-diseased-pca-cluster-check}
+pca_table <- read.delim("PBMC/PostHoc_Healthy_vs_Diseased/D0/01.Profiling/02.Dimensionality_reduction/PCA/table_pca_rotated_data.tsv")
+group_info_hd <- read.delim("../data/PBMC/group_information_table_healthy_vs_diseased_D0.tsv")
+
+hd_pca_cluster_vs_severity <- pca_table %>%
+  dplyr::select(sample_name, kmeans_cluster = group) %>%
+  dplyr::left_join(group_info_hd %>% dplyr::select(sample_name, severity = group), by = "sample_name") %>%
+  dplyr::count(kmeans_cluster, severity) %>%
+  tidyr::pivot_wider(names_from = severity, values_from = n, values_fill = 0)
+
+kable(hd_pca_cluster_vs_severity,
+  caption = "k-means cluster (PCA \"Groups\" legend) vs. true healthy/diseased group"
+) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, font_size = 12)
+```
+
+**PCA Results:** PC1 and PC2 explain 40.4% and 18.8% of variance, respectively. Cross-tabulating clusters against true labels (table above) shows only a weak tendency: cluster 1 (27 of 34 samples: 13 healthy/14 diseased) is close to the overall cohort mix (56% diseased), while cluster 2 is small (7 samples: 2 healthy/5 diseased, 71% diseased) and diseased-skewed but too small to be more than a hint — the same pattern seen in the Healthy vs Mild PCA above.
+
+```{r healthy-diseased-scree}
+scree_plot <- readRDS("PBMC/PostHoc_Healthy_vs_Diseased/D0/01.Profiling/02.Dimensionality_reduction/PCA/Scree_plot_interactive.rds")
+scree_plot
+```
+
+```{r healthy-diseased-corr-circle}
+variable_correlation_plot <- readRDS("PBMC/PostHoc_Healthy_vs_Diseased/D0/01.Profiling/02.Dimensionality_reduction/PCA/Variable_correlation_interactive.rds")
+variable_correlation_plot
+```
+
+**Severity-colored PCA:** as elsewhere, the plot below colors directly by true group (healthy/diseased) rather than by k-means cluster, with cluster kept as point shape for reference.
+
+```{r healthy-diseased-pca-severity-colored}
+pca_plot_severity <- readRDS("PBMC/PostHoc_Healthy_vs_Diseased/D0/01.Profiling/02.Dimensionality_reduction/PCA/PCA_plot_clinical_group_interactive.rds")
+pca_plot_severity
+```
+
+#### t-SNE
+
+```{r healthy-diseased-tsne}
+tsne_plot <- readRDS("PBMC/PostHoc_Healthy_vs_Diseased/D0/01.Profiling/02.Dimensionality_reduction/t-SNE/t-SNE_plot_interactive.rds")
+tsne_plot
+```
+
+**"Groups" 1/2 here are k-means clusters fit on the t-SNE embedding, not the healthy/diseased labels.**
+
+```{r healthy-diseased-tsne-cluster-check}
+tsne_table <- read.delim("PBMC/PostHoc_Healthy_vs_Diseased/D0/01.Profiling/02.Dimensionality_reduction/t-SNE/table_tsne_results.tsv")
+
+hd_tsne_cluster_vs_severity <- tsne_table %>%
+  dplyr::select(sample_name, kmeans_cluster = group) %>%
+  dplyr::left_join(group_info_hd %>% dplyr::select(sample_name, severity = group), by = "sample_name") %>%
+  dplyr::count(kmeans_cluster, severity) %>%
+  tidyr::pivot_wider(names_from = severity, values_from = n, values_fill = 0)
+
+kable(hd_tsne_cluster_vs_severity,
+  caption = "k-means cluster (t-SNE \"Groups\" legend) vs. true healthy/diseased group"
+) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, font_size = 12)
+```
+
+**t-SNE:** Cluster 1 (13 samples: 4 healthy/9 diseased, 69% diseased) skews diseased and cluster 2 (21 samples: 11 healthy/10 diseased, 48% diseased) is close to even — a modest tendency in the expected direction, weaker than Healthy vs Mild's UMAP result but stronger than Healthy vs Severe's near-total absence of separation.
+
+#### UMAP
+
+```{r healthy-diseased-umap}
+umap_plot <- readRDS("PBMC/PostHoc_Healthy_vs_Diseased/D0/01.Profiling/02.Dimensionality_reduction/UMAP/UMAP_plot_interactive.rds")
+umap_plot
+```
+
+**"Groups" 1/2 here are k-means clusters fit on the UMAP embedding, not the healthy/diseased labels.**
+
+```{r healthy-diseased-umap-cluster-check}
+umap_table <- read.delim("PBMC/PostHoc_Healthy_vs_Diseased/D0/01.Profiling/02.Dimensionality_reduction/UMAP/UMAP_results.tsv")
+
+hd_umap_cluster_vs_severity <- umap_table %>%
+  dplyr::select(sample_name, kmeans_cluster = group) %>%
+  dplyr::left_join(group_info_hd %>% dplyr::select(sample_name, severity = group), by = "sample_name") %>%
+  dplyr::count(kmeans_cluster, severity) %>%
+  tidyr::pivot_wider(names_from = severity, values_from = n, values_fill = 0)
+
+kable(hd_umap_cluster_vs_severity,
+  caption = "k-means cluster (UMAP \"Groups\" legend) vs. true healthy/diseased group"
+) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, font_size = 12)
+```
+
+**UMAP:** Cluster 1 (14 samples: 4 healthy/10 diseased, 71% diseased) and cluster 2 (20 samples: 11 healthy/9 diseased, 45% diseased) show a similar modest skew to t-SNE — a real but partial tendency, not a clean separation, consistent with 0 lipids reaching FDR significance in this comparison.
+
+### Correlation Analysis
+
+```{r healthy-diseased-correlation}
+heatmap_corr <- readRDS("PBMC/PostHoc_Healthy_vs_Diseased/D0/01.Profiling/03.Correlation_Heatmap/by_samples/Correlation_heatmap_samples_interactive.rds")
+heatmap_corr
+```
+
+**Correlation:** As in the other comparisons, most samples correlate strongly with each other regardless of group, with no clean healthy-vs-diseased block structure; the recurring quality-control outliers (e.g. BS-007-RAN-02-M3) again stand out as poorly correlated with the rest.
+
+### Lipid Characteristics
+
+```{r healthy-diseased-characteristics}
+include_graphics("PBMC/PostHoc_Healthy_vs_Diseased/D0/01.Profiling/04.Lipid_characteristics/Lipid_composition_per_sample.png")
+```
+
+**Lipid Composition:** As throughout this report, PE, PC, SM, and FA dominate composition for most samples, LPC remains a minor component, and SM proportion is the most variable class across individual samples without a clear healthy-vs-diseased pattern.
+
+## Differential Expression Analysis
+
+### Summary Statistics
+
+```{r healthy-diseased-stats}
+ttest_results <- read.delim("PBMC/PostHoc_Healthy_vs_Diseased/D0/02.DiffExp/01.t-test_results/t-test_results.tsv")
+ttest_sig <- ttest_results[ttest_results$padj < 0.05 & !is.na(ttest_results$padj), ]
+
+cat("Lipids nominally significant (p < 0.05):", nrow(ttest_results), "\n")
+cat("Of these, significant after FDR correction (padj < 0.05):", nrow(ttest_sig), "\n")
+cat("Up-regulated in Diseased (of nominal hits):", sum(ttest_results$log2FC > 0, na.rm = TRUE), "\n")
+cat("Down-regulated in Diseased (of nominal hits):", sum(ttest_results$log2FC < 0, na.rm = TRUE), "\n\n")
+
+kable(ttest_results,
+      caption = "Nominally Significant Lipids: Healthy vs Diseased (p < 0.05); none survive FDR correction",
+      digits = 4) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+                full_width = FALSE,
+                font_size = 11) %>%
+  scroll_box(width = "100%", height = "400px")
+```
+
+**Differential Expression Results — Healthy vs Diseased:** Of 121 lipids tested, 8 are nominally significant (p<0.05): **FA 18:1, TG 54:3, TG 54:4, TG 56:6, PC 32:1, TG 56:7, TG 52:4, TG 54:5** — all higher in diseased than healthy (no down-regulated hits), a coherent single-direction, TG-dominated pattern similar to Healthy vs Mild. None survive FDR correction (all padj ≈ 0.65).
+
+**Interpretation:** This result is a direct extension of Healthy vs Mild and Healthy vs Severe rather than a new signal — 7 of these 8 lipids already appeared as nominal hits in Healthy vs Mild, and pooling did not surface anything qualitatively new. See **Robustness Checks** below for how this result changes under different normalization choices and cohort sizes.
+
+### Visualization
+
+#### Volcano Plot
+
+```{r healthy-diseased-volcano-interactive}
+volcano_plot <- readRDS("PBMC/PostHoc_Healthy_vs_Diseased/D0/02.DiffExp/02.Visualizations/Volcano/Volcano_plot_interactive.rds")
+volcano_plot
+```
+
+#### MA Plot
+
+```{r healthy-diseased-ma-interactive}
+ma_plot <- readRDS("PBMC/PostHoc_Healthy_vs_Diseased/D0/02.DiffExp/02.Visualizations/MA_plot/MA_plot_interactive.rds")
+ma_plot
+```
+
+#### PLS-DA Analysis
+
+```{r healthy-diseased-plsda}
+plsda_plot <- readRDS("PBMC/PostHoc_Healthy_vs_Diseased/D0/02.DiffExp/02.Visualizations/PLS-DA/PLSDA_plot_interactive.rds")
+plsda_plot
+```
+
+```{r healthy-diseased-plsda-loading}
+loading_plot <- readRDS("PBMC/PostHoc_Healthy_vs_Diseased/D0/02.DiffExp/02.Visualizations/PLS-DA/Loading_plot_interactive.rds")
+loading_plot
+```
+
+#### Lollipop Chart
+
+```{r healthy-diseased-lollipop}
+include_graphics("PBMC/PostHoc_Healthy_vs_Diseased/D0/02.DiffExp/02.Visualizations/Lollipop_chart.png")
+```
+
+### Differential Expression by Lipid Characteristics
+
+```{r healthy-diseased-dechar, eval=FALSE}
+# Not generated in the current pipeline run for this comparison -- deChar_twoGroup()'s
+# plot objects came back NULL (unlike Healthy vs Mild/Severe/Mild vs Severe, where blank
+# but valid ggplot objects were produced), so save_static_png() silently skipped writing
+# these three files. No deChar_*.png files exist under
+# PBMC/PostHoc_Healthy_vs_Diseased/D0/02.DiffExp/02.Visualizations/.
+include_graphics("PBMC/PostHoc_Healthy_vs_Diseased/D0/02.DiffExp/02.Visualizations/deChar_TotalC_barplot.png")
+```
+
+**Differential expression by lipid characteristics (total carbon, category, class) was not generated for this comparison in the current pipeline run** — consistent with the weak, TG-dominated-only nominal signal and no FDR-significant hits.
+
+### Individual Lipid Boxplots
+
+```{r healthy-diseased-boxplots, results='asis', fig.show='hold', out.width='50%'}
+boxplot_files <- list.files("PBMC/PostHoc_Healthy_vs_Diseased/D0/02.DiffExp/03.Individual_lipid_boxplots",
+  pattern = "*.png", full.names = TRUE
+)
+if (length(boxplot_files) > 0) {
+  n_plots <- min(10, length(boxplot_files))
+  knitr::include_graphics(boxplot_files[seq_len(n_plots)])
+}
+```
+
+**Individual Lipid Boxplot Patterns:** No individual lipid boxplots were generated for the Healthy vs Diseased comparison in the current pipeline run, consistent with 0 lipids reaching FDR significance (padj < 0.05) — the boxplot generation step is triggered by FDR, not nominal, significance. Contrast this with the **All-Patients Sensitivity Analysis** below, where the larger cohort does produce 2 FDR-significant hits and therefore 2 real boxplots.
+
+## Enrichment Analysis
+
+### LSEA
+
+```{r healthy-diseased-lsea}
+include_graphics("PBMC/PostHoc_Healthy_vs_Diseased/D0/03.Enrichment/LSEA/LSEA_by_class_barplot.png")
+include_graphics("PBMC/PostHoc_Healthy_vs_Diseased/D0/03.Enrichment/LSEA/LSEA_by_category_barplot.png")
+```
+
+### ORA
+
+```{r healthy-diseased-ora}
+include_graphics("PBMC/PostHoc_Healthy_vs_Diseased/D0/03.Enrichment/ORA/ORA_by_class_barplot.png")
+include_graphics("PBMC/PostHoc_Healthy_vs_Diseased/D0/03.Enrichment/ORA/ORA_by_category_barplot.png")
+```
+
+**Enrichment Results:** As with the other comparisons, no class or category reaches significance in either LSEA or ORA — the 8 nominal, TG-dominated hits are not enough, or not sufficiently coordinated across the ranked list, to produce a significant class-level enrichment signal.
+
+## Robustness Checks: Normalization Choice and Cohort Size {#robustness-checks-hd}
+
+Two follow-up checks probed whether this null result is an artifact of specific analysis choices rather than a genuine absence of signal.
+
+**Normalization sensitivity.** Re-running the DE test under three normalization schemes — Percentage (above), PQN (Probabilistic Quotient Normalization, more robust to the compositional-closure concern raised by the total-abundance difference found in the Three-Group Analysis above), and no normalization at all — produced a cleanly nested set of nominal hits, **PQN (5) ⊂ Percentage (8) ⊂ none (13)**, with **zero FDR-significant lipids under any of the three methods** on this 34-patient cohort.
+
+```{r healthy-diseased-norm-sensitivity}
+norm_comparison <- read.delim("PBMC/PostHoc_Healthy_vs_Diseased/D0/Normalization_sensitivity/normalization_comparison.tsv")
+kable(norm_comparison,
+  caption = "DE results under Percentage, PQN, and no normalization (same 34-patient cohort, same 121 lipids)",
+  digits = 4
+) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, font_size = 10) %>%
+  scroll_box(width = "100%", height = "350px")
+```
+
+```{r healthy-diseased-norm-volcano}
+include_graphics("PBMC/PostHoc_Healthy_vs_Diseased/D0/Normalization_sensitivity/normalization_comparison_volcano.png")
+```
+
+That the more rigorous PQN correction found *fewer*, not more or different, nominal hits than Percentage argues against normalization choice being the reason real signal is going undetected — if anything, Percentage's 8 hits already look like a subset of noise that raw values pick up, not a signal that normalization is hiding.
+
+## All-Patients Sensitivity Analysis
+
+The checks above use the 34-patient cohort matched 1:1 to the plasma study. This section re-runs the full pipeline on the larger, PBMC-only 63-patient cohort instead (**57 matched samples: 15 healthy, 42 diseased** — healthy did not grow, since the same 5 healthy patients still lack PBMC data; all the extra power comes from 23 additional diseased patients not in the plasma-matched cohort).
+
+```{r healthy-diseased-all-stats}
+ttest_all <- read.delim("PBMC/PostHoc_Healthy_vs_Diseased_AllPatients/D0/02.DiffExp/01.t-test_results/t-test_results.tsv")
+ttest_all_sig <- ttest_all[ttest_all$padj < 0.05 & !is.na(ttest_all$padj), ]
+
+cat("Lipids nominally significant (p < 0.05):", nrow(ttest_all), "\n")
+cat("Of these, significant after FDR correction (padj < 0.05):", nrow(ttest_all_sig), "\n")
+
+kable(ttest_all,
+      caption = "Nominally Significant Lipids: Healthy vs Diseased, All-Patients Cohort (n=57); FA 18:1 and PC 32:1 survive FDR correction",
+      digits = 4) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+                full_width = FALSE,
+                font_size = 11) %>%
+  scroll_box(width = "100%", height = "350px")
+```
+
+**FA 18:1 and PC 32:1 now clear FDR correction when tested on the full PBMC patient list, not just the smaller cohort matched 1:1 to the plasma study** (padj = 0.042 for both) — both were already among the strongest, most consistent nominal hits at n=34, so this reads as a real effect that the smaller cohort was underpowered to resolve, not a new artifact of the larger one. 11 lipids are nominally significant in total (vs. 8 at n=34), and — because boxplot generation is FDR- rather than nominal-triggered (see note above) — this is the only Healthy vs Diseased run in this report to actually produce individual lipid boxplots:
+
+```{r healthy-diseased-all-boxplots, results='asis', fig.show='hold', out.width='50%'}
+boxplot_files_all <- list.files("PBMC/PostHoc_Healthy_vs_Diseased_AllPatients/D0/02.DiffExp/03.Individual_lipid_boxplots",
+  pattern = "*.png", full.names = TRUE
+)
+if (length(boxplot_files_all) > 0) {
+  knitr::include_graphics(boxplot_files_all)
+}
+```
+
+```{r healthy-diseased-all-pca}
+pca_plot_all_severity <- readRDS("PBMC/PostHoc_Healthy_vs_Diseased_AllPatients/D0/01.Profiling/02.Dimensionality_reduction/PCA/PCA_plot_clinical_group_interactive.rds")
+pca_plot_all_severity
+```
+
+```{r healthy-diseased-all-pca-cluster-check}
+pca_table_all <- read.delim("PBMC/PostHoc_Healthy_vs_Diseased_AllPatients/D0/01.Profiling/02.Dimensionality_reduction/PCA/table_pca_rotated_data.tsv")
+group_info_hd_all <- read.delim("../data/PBMC/group_information_table_healthy_vs_diseased_D0_all.tsv")
+
+hd_all_pca_cluster_vs_severity <- pca_table_all %>%
+  dplyr::select(sample_name, kmeans_cluster = group) %>%
+  dplyr::left_join(group_info_hd_all %>% dplyr::select(sample_name, severity = group), by = "sample_name") %>%
+  dplyr::count(kmeans_cluster, severity) %>%
+  tidyr::pivot_wider(names_from = severity, values_from = n, values_fill = 0)
+
+kable(hd_all_pca_cluster_vs_severity,
+  caption = "k-means cluster (PCA \"Groups\" legend) vs. true healthy/diseased group, all-patients cohort"
+) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, font_size = 12)
+```
+
+**PCA (all-patients):** PC1/PC2 explain 32.8%/20.1% of variance (vs. 40.4%/18.8% at n=34 — PC1's share drops as more heterogeneous diseased patients are added). Cluster composition (41 samples: 29 diseased/12 healthy in cluster 1; 16 samples: 13 diseased/3 healthy in cluster 2) tracks the cohort's now-skewed 74% diseased baseline closely in both clusters — essentially no separation, the same qualitative conclusion as at n=34.
+
+```{r healthy-diseased-all-caveat, echo=FALSE, results='asis'}
+cat("**Caveat:** this is not a strict apples-to-apples replication of the 34-patient result above. The comparison is now considerably more unbalanced (15 vs. 42, versus 15 vs. 19), and the 23 extra diseased patients were not part of the cohort deliberately matched to the plasma study. `FA 18:1` and `PC 32:1` are nonetheless the strongest candidate leads in the PBMC arm for a properly powered, balanced follow-up cohort — full profiling, correlation, and enrichment output for this run is saved under `PBMC/PostHoc_Healthy_vs_Diseased_AllPatients/D0/` alongside the 34-patient results.")
+```
+
+### PQN Normalization Check (All-Patients Cohort)
+
+**What is PQN?** Probabilistic Quotient Normalization estimates a single scaling factor per sample by comparing that sample's whole lipid profile against a reference profile (the median across all samples), rather than forcing every sample to sum to a fixed total the way Percentage normalization does. Concretely: for each sample, PQN divides its abundance for every lipid by the reference sample's abundance for that same lipid, giving one "quotient" per lipid, then takes the **median** of all those quotients as the sample's single normalization factor. Using the median instead of the sum makes PQN much less sensitive to any one lipid (or small handful of lipids) that is genuinely, biologically elevated or depleted — a sum-based method like Percentage spreads that one real change across every other feature as an artificial decrease, while a median is largely unmoved by a few outlying values. This is why PQN is the standard normalization in NMR metabolomics and is increasingly used in lipidomics specifically to guard against the "compositional closure" problem raised earlier in this report: if total lipid burden genuinely differs by group (as found in the Three-Group Analysis above), Percentage normalization risks partly laundering that real difference into distorted individual-lipid values, whereas PQN's median-based reference is more robust to it.
+
+**Data Quality (PQN):** the density plot shows each sample's raw distribution before normalization, and after both PQN and (for comparison) Percentage-normalized density and boxplot views:
+
+```{r healthy-diseased-all-pqn-quality}
+include_graphics("PBMC/PostHoc_Healthy_vs_Diseased_AllPatients/D0/01.Profiling/00.Data_quality_PQN/Data_quality_density_before.png")
+include_graphics("PBMC/PostHoc_Healthy_vs_Diseased_AllPatients/D0/01.Profiling/00.Data_quality_PQN/Data_quality_density_after_PQN.png")
+include_graphics("PBMC/PostHoc_Healthy_vs_Diseased_AllPatients/D0/01.Profiling/00.Data_quality/Data_quality_boxplot_after.png")
+include_graphics("PBMC/PostHoc_Healthy_vs_Diseased_AllPatients/D0/01.Profiling/00.Data_quality_PQN/Data_quality_boxplot_after_PQN.png")
+```
+
+The pre-normalization density plot is identical regardless of normalization method (it's the same raw data); comparing the two post-normalization boxplots side by side shows PQN pulling sample distributions toward a common center by a per-sample median-quotient factor rather than forcing every sample to the same total, visibly less aggressive than Percentage's tight, uniform banding.
+
+Applying PQN to the same 57-sample all-patients cohort (data already computed during the earlier normalization-sensitivity check) shows what changes:
+
+```{r healthy-diseased-all-pqn-check}
+pqn_all_comparison <- read.delim("PBMC/PostHoc_Healthy_vs_Diseased/D0/All_patients_check/all_patients_comparison.tsv")
+
+pqn_all_display <- pqn_all_comparison %>%
+  dplyr::filter(pval_Percentage < 0.05 | pval_PQN < 0.05) %>%
+  dplyr::select(feature, pval_Percentage, padj_Percentage, pval_PQN, padj_PQN) %>%
+  dplyr::arrange(pval_Percentage)
+
+kable(pqn_all_display,
+  caption = "Percentage vs. PQN normalization, All-Patients Cohort (n=57) -- lipids nominally significant under either method",
+  digits = 4
+) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE, font_size = 11) %>%
+  row_spec(which(pqn_all_display$feature %in% c("FA 18:1", "PC 32:1")), background = "#FFF3CD")
+```
+
+**Both `FA 18:1` and `PC 32:1` drop out of FDR significance under PQN.** Their nominal p-values barely move (p ≈ 8×10⁻⁴ under both methods for `FA 18:1`; similar for `PC 32:1`), but `padj` rises just past the 0.05 cutoff — from **0.042 (Percentage) to 0.053 (PQN)** for both lipids, highlighted above. This is a narrow miss, not a reversal: the underlying effect size and nominal significance are essentially unchanged, and PQN finds a comparably-sized pool of nominal hits here (12, vs. Percentage's 11, with 6 in common) showing the same TG/FA/PC-dominated pattern — unlike the canonical 34-patient cohort, where PQN was the more conservative method (5 nominal hits vs. Percentage's 8). The boxplots below show all 12 lipids nominally significant under PQN (sorted by significance, not just `FA 18:1`/`PC 32:1`), under actual PQN-normalized abundance values rather than just the p-value table above:
+
+```{r healthy-diseased-all-pqn-boxplots}
+pqn_boxplot_files <- list.files("PBMC/PostHoc_Healthy_vs_Diseased_AllPatients/D0/02.DiffExp/03.Individual_lipid_boxplots_PQN",
+  pattern = "*.png", full.names = TRUE
+)
+if (length(pqn_boxplot_files) > 0) {
+  knitr::include_graphics(pqn_boxplot_files)
+}
+```
+
+The honest summary is: **`FA 18:1` and `PC 32:1` are borderline under any normalization choice** — real enough to be the most consistent leads across every check in this report, but not robust enough to call "confirmed" regardless of which normalization method is used.
+
+---
+
 # Cross-Comparison Summary
 
 ## Overview
 
-This section integrates findings from all four analyses (three-group ANOVA and three pairwise comparisons). Across all of them, the consistent picture is one of **limited statistical power and modest effect sizes** rather than a dominant, universal lipid signature:
+This section integrates findings from all five analyses (three-group ANOVA and four pairwise comparisons). Across all of them, the consistent picture is one of **limited statistical power and modest effect sizes** rather than a dominant, universal lipid signature:
 
-| Comparison | n | Lipids tested | Nominal hits (p<0.05) | FDR-significant (padj<0.05) |
+| Comparison | n analyzed | Lipids tested | Nominal hits (p<0.05) | FDR-significant (padj<0.05) |
 |---|---|---|---|---|
-| Healthy vs Mild vs Severe (ANOVA) | 40 | 110 | 11 | 0 |
-| Healthy vs Mild | 31 | 110 | 17 | 0 |
-| Healthy vs Severe | 29 | 110 | 1 | 0 |
-| Mild vs Severe | 20 | 110 | 9 | **1 (SM 34:1;O2)** |
+| Healthy vs Mild vs Severe (ANOVA) | 34 | 110 | 11 | 0 |
+| Healthy vs Mild | 26 | 110 | 17 | 0 |
+| Healthy vs Severe | 23 | 110 | 1 | 0 |
+| Mild vs Severe | 19 | 110 | 9 | **1 (SM 34:1;O2)** |
+| Healthy vs Diseased (Mild+Severe pooled) | 34 | 121 | 8 | 0 |
+| Healthy vs Diseased, all-patients cohort | 57 | 121 | 11 | **2 (FA 18:1, PC 32:1)** |
 
-The only comparison to survive multiple-testing correction anywhere in this study is Mild vs Severe, with a single lipid (SM 34:1;O2, lower in severe disease). The Healthy vs Severe comparison — despite comparing the most clinically distinct groups — has the weakest signal, most likely reflecting its small sample size (n=9 severe patients).
+*(The "110 vs 121" lipids-tested discrepancy reflects when each comparison's underlying data was last regenerated relative to a rgoslin ether-lipid recognition fix applied during this project — not a difference in analysis method. Healthy vs Diseased was built after that fix and tests the larger, more complete panel.)*
+
+The only comparisons to survive multiple-testing correction anywhere in this study are Mild vs Severe (SM 34:1;O2, lower in severe disease) and the all-patients Healthy vs Diseased sensitivity check (FA 18:1, PC 32:1, both higher in diseased) — the latter read with the caveat that it is an unbalanced, non-plasma-matched cohort (see **Robustness Checks**, above and in Post-Hoc Analysis 4). Among the four comparisons run on the canonical, plasma-matched cohort, Healthy vs Severe has the weakest signal despite comparing the most clinically distinct groups, most likely reflecting its small sample size (n=8 severe patients with PBMC data).
 
 ## Venn Diagram of Significant Lipids
 
@@ -1249,12 +1785,13 @@ Notably, **Glycerophospholipids [GP]** — the category containing PC and LPC �
 
 This lipidomics analysis of dengue disease severity found:
 
-1. **No FDR-significant lipid differences** in the three-group ANOVA, Healthy vs Mild, or Healthy vs Severe comparisons
-2. **One FDR-significant lipid** overall — SM 34:1;O2, lower in severe than mild disease (Mild vs Severe comparison, padj = 0.047)
-3. **Modest nominal (uncorrected) trends** that differ in character between comparisons: TG-dominated in the three-group ANOVA and Healthy vs Mild, a single FA hit in Healthy vs Severe, and SM/PC-dominated in Mild vs Severe
+1. **No FDR-significant lipid differences** in the three-group ANOVA, Healthy vs Mild, Healthy vs Severe, or Healthy vs Diseased (Mild+Severe pooled) comparisons — on the canonical, plasma-matched cohort
+2. **One FDR-significant lipid** on the canonical cohort — SM 34:1;O2, lower in severe than mild disease (Mild vs Severe comparison, padj = 0.047)
+3. **Modest nominal (uncorrected) trends** that differ in character between comparisons: TG-dominated in the three-group ANOVA, Healthy vs Mild, and Healthy vs Diseased, a single FA hit in Healthy vs Severe, and SM/PC-dominated in Mild vs Severe
 4. **No evidence for a dominant LPC/PLA2-driven signature**: LPC appears in only one nominal hit across the entire study, and glycerophospholipids are consistently the *weakest*, not strongest, category in enrichment analyses
 5. **Partial, overlapping separation** by unsupervised ordination (PCA, t-SNE, UMAP) in every comparison — no method fully separates any pair of groups, though supervised PLS-DA achieves cleaner separation for Mild vs Severe
 6. **Persistent outlier samples** (e.g. BS-082D0, BS-364D0, KT-663D0, KT-705D0, BS-356-RAN-03-M4, BS-007-RAN-02-M3, JV-070-MIN-01-M1) remain more dispersed than the rest of the cohort even after normalization, adding noise that likely reduces statistical power throughout
+7. **FA 18:1 and PC 32:1 now clear FDR correction when tested on the full PBMC patient list**, not just the smaller cohort matched 1:1 to the plasma study (see [Robustness Checks](#robustness-checks) below for the important caveat that this comes from an unbalanced comparison, not a like-for-like replication)
 
 ## Biological Interpretation
 
@@ -1268,13 +1805,17 @@ This lipidomics analysis of dengue disease severity found:
 - The consistent (but non-significant) TG-related trend across the three-group ANOVA and Healthy vs Mild comparisons could be worth testing with more statistical power or a larger panel of TG species
 - No lipid or lipid class in this dataset currently meets the bar needed to be proposed as a diagnostic or prognostic biomarker on its own
 
+## Robustness Checks
+
+**`FA 18:1` and `PC 32:1` now clear FDR correction when tested on the full PBMC patient list, not just the smaller cohort selected to match the plasma study.** Full detail — the normalization-sensitivity check (PQN/Percentage/none) and the complete all-patients pipeline run with its own plots, DE table, and boxplots — is in the **[Robustness Checks](#robustness-checks-hd) and All-Patients Sensitivity Analysis** subsections at the end of Post-Hoc Analysis 4 (Healthy vs Diseased) above, rather than repeated here. In short: normalization choice does not change the null conclusion at n=34 (0 FDR-significant under Percentage, PQN, or no normalization), while the larger 57-sample cohort does surface 2 FDR-significant lipids — read with the caveat that this comes from an unbalanced (15 vs. 42) comparison on a cohort not curated to match the plasma study, not a like-for-like replication.
+
 ## Comparison with Literature
 
-Other dengue lipidomics studies have reported phospholipid remodeling and PLA2 activation as prominent features of infection. **This dataset does not reproduce that pattern** — whether because of differences in sample type (PBMC-associated plasma vs. other biospecimens), cohort characteristics, disease timepoint, or simply limited statistical power in the severe-patient group (n=9), cannot be determined from this analysis alone. This discrepancy with prior literature is itself a notable result and should be discussed transparently rather than reconciled by over-interpreting the current data.
+Other dengue lipidomics studies have reported phospholipid remodeling and PLA2 activation as prominent features of infection. **This dataset does not reproduce that pattern** — whether because of differences in sample type (PBMC-associated plasma vs. other biospecimens), cohort characteristics, disease timepoint, or simply limited statistical power in the severe-patient group (n=8 with PBMC data), cannot be determined from this analysis alone. This discrepancy with prior literature is itself a notable result and should be discussed transparently rather than reconciled by over-interpreting the current data.
 
 ## Limitations
 
-1. **Statistical power:** With group sizes as small as n=9 (severe) and only 110 lipids tested, the study is underpowered to detect anything but large, consistent effects after multiple-testing correction
+1. **Statistical power:** With group sizes as small as n=8 (severe, with PBMC data) and only 110 lipids tested, the study is underpowered to detect anything but large, consistent effects after multiple-testing correction
 2. **Cross-sectional design:** D0 timepoint only; longitudinal sampling would reveal temporal dynamics
 3. **Sample heterogeneity:** Several samples show substantially wider abundance spread than the rest of the cohort even after normalization, which likely adds noise and further reduces power
 4. **Correlative nature:** Even the one FDR-significant finding (SM 34:1;O2) cannot establish causality between lipid changes and disease mechanisms
@@ -1288,7 +1829,7 @@ Other dengue lipidomics studies have reported phospholipid remodeling and PLA2 a
 ## Future Directions
 
 1. **Increase statistical power:**
-   - Recruit larger cohorts, particularly for the severe-disease group (currently n=9)
+   - Recruit larger cohorts, particularly for the severe-disease group (currently n=8 with PBMC data, n=9 in the nominal clinical cohort)
    - Consider pooling with additional cohorts to re-test the TG- and SM-related nominal trends found here
 
 2. **Investigate the SM 34:1;O2 finding:**
@@ -1311,13 +1852,13 @@ Other dengue lipidomics studies have reported phospholipid remodeling and PLA2 a
 
 This lipidomics analysis of dengue disease severity found **limited evidence of robust lipid dysregulation** in this cohort. Key conclusions:
 
-1. **Only one lipid, SM 34:1;O2, is significant after FDR correction** — lower in severe than mild dengue patients — and it is the sole statistically robust finding across all four analyses performed (three-group ANOVA and three pairwise comparisons)
+1. **Only one lipid, SM 34:1;O2, is significant after FDR correction on the canonical, plasma-matched cohort** — lower in severe than mild dengue patients — the sole statistically robust finding across the five canonical-cohort analyses performed (three-group ANOVA and four pairwise comparisons)
 
-2. **No FDR-significant differences** were found between healthy controls and either mild or severe dengue patients, nor in the three-group ANOVA
+2. **No FDR-significant differences** were found between healthy controls and mild, severe, or pooled diseased dengue patients on the canonical cohort, nor in the three-group ANOVA. A robustness check on a larger, non-plasma-matched, unbalanced PBMC cohort (57 vs. the canonical 34) does find **FA 18:1 and PC 32:1 FDR-significant** for Healthy vs Diseased — a promising lead for a properly powered follow-up, not a confirmed finding on this study's primary cohort (see Post-Hoc Analysis 4)
 
 3. **The data do not support a dominant LPC/PLA2-driven glycerophospholipid signature**: LPC is not a prominent hit in any comparison, and glycerophospholipids are consistently the weakest category in enrichment analyses — a notable departure from patterns reported in some other dengue lipidomics studies
 
-4. **Nominal (uncorrected) trends** — TG elevation in mild disease, SM/PC/cholesterol reduction with severity — are worth further investigation but should not be treated as validated findings given this study's limited statistical power (n=9-20 per group after pairing)
+4. **Nominal (uncorrected) trends** — TG elevation in mild disease, SM/PC/cholesterol reduction with severity — are worth further investigation but should not be treated as validated findings given this study's limited statistical power (n=8-15 per group after pairing)
 
 5. **Persistent sample-level heterogeneity**, even after normalization, likely contributes to the limited statistical power observed throughout
 

@@ -1,0 +1,18 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+.DS_Store
+
+# leftover macOS/ARM package source copy (installed via renv from GitHub instead, see CLAUDE.md)
+LipidSigR/
+
+# old/superseded analysis outputs
+analysis/deprecated/
+
+# rendered HTML reports and htmlwidget outputs (regenerate via rmarkdown::render)
+*.html
+*_files/
+
+# zip archives (manual backups, not source of truth)
+*.zip

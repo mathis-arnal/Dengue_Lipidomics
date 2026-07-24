@@ -20,6 +20,9 @@ library(SummarizedExperiment)
 library(dplyr)
 library(readr)
 library(rgoslin)
+library(ggplot2)
+
+source("code/lipidomics_functions.R")
 
 # Set working directory
 setwd("E:/Dengue_lipidomics")
@@ -39,103 +42,42 @@ cat("========================================\n")
 
 cat("\n=== 1. DATA LOADING & PREPARATION ===\n")
 
-# Create output directories
-dir.create(file.path(base_dir, "01.Profiling/00.Data_quality"), recursive = TRUE, showWarnings = FALSE)
-dir.create(file.path(base_dir, "01.Profiling/01.Cross-sample_variability"), recursive = TRUE, showWarnings = FALSE)
-dir.create(file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/PCA"), recursive = TRUE, showWarnings = FALSE)
-dir.create(file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/t-SNE"), recursive = TRUE, showWarnings = FALSE)
-dir.create(file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/UMAP"), recursive = TRUE, showWarnings = FALSE)
-dir.create(file.path(base_dir, "01.Profiling/03.Correlation_Heatmap/by_samples"), recursive = TRUE, showWarnings = FALSE)
-dir.create(file.path(base_dir, "01.Profiling/03.Correlation_Heatmap/by_category"), recursive = TRUE, showWarnings = FALSE)
-dir.create(file.path(base_dir, "01.Profiling/03.Correlation_Heatmap/by_class"), recursive = TRUE, showWarnings = FALSE)
-dir.create(file.path(base_dir, "01.Profiling/04.Lipid_characteristics"), recursive = TRUE, showWarnings = FALSE)
-dir.create(file.path(base_dir, "02.DiffExp/01.ANOVA"), recursive = TRUE, showWarnings = FALSE)
-dir.create(file.path(base_dir, "02.DiffExp/02.Visualizations"), recursive = TRUE, showWarnings = FALSE)
-dir.create(file.path(base_dir, "02.DiffExp/03.Individual_lipid_boxplots"), recursive = TRUE, showWarnings = FALSE)
-dir.create(file.path(base_dir, "03.Enrichment/LSEA"), recursive = TRUE, showWarnings = FALSE)
-dir.create(file.path(base_dir, "03.Enrichment/ORA"), recursive = TRUE, showWarnings = FALSE)
+create_output_dirs(base_dir, c(
+  "01.Profiling/00.Data_quality",
+  "01.Profiling/01.Cross-sample_variability",
+  "01.Profiling/02.Dimensionality_reduction/PCA",
+  "01.Profiling/02.Dimensionality_reduction/t-SNE",
+  "01.Profiling/02.Dimensionality_reduction/UMAP",
+  "01.Profiling/03.Correlation_Heatmap/by_samples",
+  "01.Profiling/03.Correlation_Heatmap/by_category",
+  "01.Profiling/03.Correlation_Heatmap/by_class",
+  "01.Profiling/04.Lipid_characteristics",
+  "02.DiffExp/01.ANOVA",
+  "02.DiffExp/02.Visualizations",
+  "02.DiffExp/03.Individual_lipid_boxplots",
+  "03.Enrichment/LSEA",
+  "03.Enrichment/ORA"
+))
 
-##########################################################################################
-# 1. CHECK SAMPLE CONSISTENCY 
-##########################################################################################
-
-# Load group data
-group_info <- read_tsv("data/PBMC/group_information_table_healthy_vs_sick_patients_D0.tsv")  %>% 
-mutate(pair = group)
-
-# Load abundance data
-abundance <- read_tsv("data/PBMC/PBMC_lipid_abundance_data_D0.tsv")
-
-# Find samples that exist in BOTH files
-selected_patients <- group_info$sample_name
-available_samples <- colnames(abundance)
-matched_samples <- intersect(selected_patients, available_samples)
-
-cat("Samples in group_info:", length(selected_patients), "\n")
-cat("Samples in abundance:", length(available_samples) - 3, "\n")  # subtract metadata columns
-cat("Matched samples:", length(matched_samples), "\n")
-cat("Unmatched from group_info:", setdiff(selected_patients, available_samples), "\n\n")
-
-cat(" The 6 missing samples are expected,  KT-312D0 doesn't have enough PBMC. Les 5 healthy ne rentraient pas dans la machine.")
-
-# Now select only matched samples + metadata
-abundance <- abundance %>% 
-  dplyr::select(feature, all_of(matched_samples))
-cat("  Features:", nrow(abundance), "\n")
-cat("  Samples:", ncol(abundance) - 1, "\n")
-
-group_info <- group_info %>% 
-  filter(sample_name %in% matched_samples) %>% 
-  dplyr::select(-pair)
-cat("  Total patient count:", nrow(group_info), "\n")
-cat("  Healthy patient count:", nrow(group_info[group_info$group=="healthy",]), "\n")
-cat("  Mild patient count:", nrow(group_info[group_info$group=="mild",]), "\n")
-cat("  Severe patient count:", nrow(group_info[group_info$group=="severe",]), "\n")
-
-cat("Parsing lipid nomenclature with rgoslin...\n")
-
-# change (1,2) DG 32:0 to DG 32:0
-abundance$feature <- gsub("\\(\\d+,\\d+\\) DG", "DG", abundance$feature)
-# change Cer 34:1,O2 to Cer 34:1;O2
-abundance$feature <- gsub(",", ";", abundance$feature)
-
-# Parse lipid names with rgoslin
-parse_lipid <- rgoslin::parseLipidNames(lipidNames = abundance$feature)
-# Try these formats:
-
-# Filter recognized lipids
-recognized_lipids <- parse_lipid$Original.Name[which(parse_lipid$Grammar != "NOT_PARSEABLE")]
-abundance_filtered <- abundance %>% dplyr::filter(feature %in% recognized_lipids)
-goslin_annotation <- parse_lipid %>% dplyr::filter(Original.Name %in% recognized_lipids)
-
-cat("  Recognized lipids:", length(recognized_lipids), "/", nrow(abundance), "\n")
-cat("  Recognition rate:", round(100 * length(recognized_lipids) / nrow(abundance), 1), "%\n")
-
-# Construct SummarizedExperiment object
-cat("Creating SummarizedExperiment object...\n")
-se <- as_summarized_experiment(
-  abundance_filtered,
-  goslin_annotation,
-  group_info = group_info,
-  se_type = "de_multiple", # Multi-group comparison
-  paired_sample = NULL
+cat("Loading group information and abundance data...\n")
+loaded <- load_and_match_samples(
+  "data/PBMC/group_information_table_healthy_vs_sick_patients_D0.tsv",
+  "data/PBMC/PBMC_lipid_abundance_data_D0.tsv"
 )
+abundance <- loaded$abundance
+group_info <- loaded$group_info
+cat(" The 6 missing samples are expected, KT-312D0 doesn't have enough PBMC.",
+    "Les 5 healthy ne rentraient pas dans la machine.\n")
 
-cat("  ✓ SummarizedExperiment created\n")
+annotated <- clean_and_annotate_lipids(abundance)
 
-# Data processing
-cat("Processing data (filtering, normalization, transformation)...\n")
-processed_se <- data_process(
-  se,
-  exclude_missing = TRUE, # Remove features with too many missing values
-  exclude_missing_pct = 70, # Keep features present in ≥70% samples
-  replace_na_method = "min", # Replace NA with minimum value
-  replace_na_method_ref = 0.5, # Factor for minimum value
-  normalization = "Percentage", # Normalization method
-  transform = "log10" # Log10 transformation
+# Construct SummarizedExperiment object + process
+se_result <- build_processed_se(
+  annotated$abundance_filtered, annotated$goslin_annotation, group_info,
+  se_type = "de_multiple", exclude_missing_pct = 70, paired_sample = NULL
 )
-
-cat("  ✓ Data processing complete\n")
+se <- se_result$se
+processed_se <- se_result$processed_se
 
 
 ##########################################################################################
@@ -148,29 +90,22 @@ cat("\n=== 2. PROFILING - DATA QUALITY ===\n")
 cat("Generating data quality plots...\n")
 data_process_plots <- plot_data_process(se, processed_se)
 
-png(file.path(base_dir, "01.Profiling/00.Data_quality/BoxPlot_before_process.png"),
-  width = 1400, height = 1000, res = 150
+save_static_png(data_process_plots$static_boxPlot_before,
+  file.path(base_dir, "01.Profiling/00.Data_quality/BoxPlot_before_process.png"),
+  width = 1400, height = 1000
 )
-print(data_process_plots$static_boxPlot_before)
-dev.off()
-
-png(file.path(base_dir, "01.Profiling/00.Data_quality/BoxPlot_after_process.png"),
-  width = 1400, height = 1000, res = 150
+save_static_png(data_process_plots$static_boxPlot_after,
+  file.path(base_dir, "01.Profiling/00.Data_quality/BoxPlot_after_process.png"),
+  width = 1400, height = 1000
 )
-print(data_process_plots$static_boxPlot_after)
-dev.off()
-
-png(file.path(base_dir, "01.Profiling/00.Data_quality/DensityPlot_before_process.png"),
-  width = 1400, height = 1000, res = 150
+save_static_png(data_process_plots$static_densityPlot_before,
+  file.path(base_dir, "01.Profiling/00.Data_quality/DensityPlot_before_process.png"),
+  width = 1400, height = 1000
 )
-print(data_process_plots$static_densityPlot_before)
-dev.off()
-
-png(file.path(base_dir, "01.Profiling/00.Data_quality/DensityPlot_after_process.png"),
-  width = 1400, height = 1000, res = 150
+save_static_png(data_process_plots$static_densityPlot_after,
+  file.path(base_dir, "01.Profiling/00.Data_quality/DensityPlot_after_process.png"),
+  width = 1400, height = 1000
 )
-print(data_process_plots$static_densityPlot_after)
-dev.off()
 
 cat("  ✓ Data quality plots saved\n")
 
@@ -179,23 +114,18 @@ cat("  ✓ Data quality plots saved\n")
 cat("Analyzing cross-sample variability...\n")
 cross_var_result <- cross_sample_variability(se)
 
-png(file.path(base_dir, "01.Profiling/01.Cross-sample_variability/Expressed_lipid_numbers.png"),
-  width = 1600, height = 1000, res = 150
+save_static_png(cross_var_result$static_lipid_number_barPlot,
+  file.path(base_dir, "01.Profiling/01.Cross-sample_variability/Expressed_lipid_numbers.png"),
+  width = 1600, height = 1000
 )
-print(cross_var_result$static_lipid_number_barPlot)
-dev.off()
-
-png(file.path(base_dir, "01.Profiling/01.Cross-sample_variability/Histogram_lipid_amount.png"),
-  width = 1400, height = 1000, res = 150
+save_static_png(cross_var_result$static_lipid_amount_barPlot,
+  file.path(base_dir, "01.Profiling/01.Cross-sample_variability/Histogram_lipid_amount.png"),
+  width = 1400, height = 1000
 )
-print(cross_var_result$static_lipid_amount_barPlot)
-dev.off()
-
-png(file.path(base_dir, "01.Profiling/01.Cross-sample_variability/Lipid_abundance_distribution.png"),
-  width = 1400, height = 1000, res = 150
+save_static_png(cross_var_result$static_lipid_distribution,
+  file.path(base_dir, "01.Profiling/01.Cross-sample_variability/Lipid_abundance_distribution.png"),
+  width = 1400, height = 1000
 )
-print(cross_var_result$static_lipid_distribution)
-dev.off()
 
 cat("  ✓ Cross-sample variability analysis complete\n")
 
@@ -223,81 +153,45 @@ result_pca <- dr_pca(
   plot_topN = 10
 )
 
-pca_data <- result_pca$pca_rotated_data %>%
-  dplyr::rename(cluster = group) %>%
-  dplyr::mutate(cluster = factor(cluster)) %>%
-  dplyr::left_join(group_info %>% dplyr::select(sample_name, group), by = "sample_name")
+# Severity-colored PCA (color = true clinical group, shape = unsupervised k-means
+# cluster, 95% ellipse per group) -- see plot_pca_by_severity() in
+# lipidomics_functions.R for why clustering="group_info" can't be used directly here.
+pca_severity <- plot_pca_by_severity(result_pca, group_info)
 
-library(ggplot2)
-g <- ggplot(pca_data, aes(x = PC1, y = PC2, color = group, shape = cluster, text = sample_name)) +
-  geom_point(size = 3) +
-  theme_bw() +
-  labs(color = "Clinical group", shape = "K-means cluster (unsupervised)")
-
-png(file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/PCA/PCA_plot_clinical_group.png"),
-  width = 1400, height = 1000, res = 150
+save_static_png(pca_severity$plot,
+  file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/PCA/PCA_plot_clinical_group.png"),
+  width = 1400, height = 1000
 )
-print(g)
-dev.off()
+save_interactive_rds(pca_severity$plot_interactive,
+  file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/PCA/PCA_plot_clinical_group_interactive.rds"))
 
-# Save interactive version (color = clinical group, shape = k-means cluster) as RDS
-g_interactive <- plotly::ggplotly(g, tooltip = c("text", "colour", "shape"))
-saveRDS(g_interactive,
-  file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/PCA/PCA_plot_clinical_group_interactive.rds")
+save_static_png(result_pca$static_pca,
+  file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/PCA/PCA_plot.png"),
+  width = 1400, height = 1000
 )
+save_interactive_rds(result_pca$interactive_pca,
+  file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/PCA/PCA_plot_interactive.rds"))
 
-
-png(file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/PCA/PCA_plot.png"),
-  width = 1400, height = 1000, res = 150
+save_static_png(result_pca$static_screePlot,
+  file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/PCA/Scree_plot.png"),
+  width = 1400, height = 1000
 )
-print(result_pca$static_pca)
-dev.off()
+save_interactive_rds(result_pca$interactive_screePlot,
+  file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/PCA/Scree_plot_interactive.rds"))
 
-# Save interactive PCA plot as RDS
-if (!is.null(result_pca$interactive_pca)) {
-  saveRDS(result_pca$interactive_pca,
-    file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/PCA/PCA_plot_interactive.rds")
-  )
-}
-
-png(file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/PCA/Scree_plot.png"),
-  width = 1400, height = 1000, res = 150
+save_static_png(result_pca$static_feature_contribution,
+  file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/PCA/Feature_contribution.png"),
+  width = 1400, height = 1000
 )
-print(result_pca$static_screePlot)
-dev.off()
+save_interactive_rds(result_pca$interactive_feature_contribution,
+  file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/PCA/Feature_contribution_interactive.rds"))
 
-# Save interactive scree plot as RDS
-if (!is.null(result_pca$interactive_screePlot)) {
-  saveRDS(result_pca$interactive_screePlot,
-    file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/PCA/Scree_plot_interactive.rds")
-  )
-}
-
-png(file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/PCA/Feature_contribution.png"),
-  width = 1400, height = 1000, res = 150
+save_static_png(result_pca$static_variablePlot,
+  file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/PCA/Variable_correlation.png"),
+  width = 1400, height = 1000
 )
-print(result_pca$static_feature_contribution)
-dev.off()
-
-# Save interactive feature contribution as RDS
-if (!is.null(result_pca$interactive_feature_contribution)) {
-  saveRDS(result_pca$interactive_feature_contribution,
-    file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/PCA/Feature_contribution_interactive.rds")
-  )
-}
-
-png(file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/PCA/Variable_correlation.png"),
-  width = 1400, height = 1000, res = 150
-)
-print(result_pca$static_variablePlot)
-dev.off()
-
-# Save interactive variable correlation as RDS
-if (!is.null(result_pca$interactive_variablePlot)) {
-  saveRDS(result_pca$interactive_variablePlot,
-    file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/PCA/Variable_correlation_interactive.rds")
-  )
-}
+save_interactive_rds(result_pca$interactive_variablePlot,
+  file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/PCA/Variable_correlation_interactive.rds"))
 
 write_tsv(result_pca$table_pca_contribution,
   file = file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/PCA/table_pca_contribution.tsv")
@@ -325,18 +219,12 @@ result_tsne <- dr_tsne(
   minPts = NULL
 )
 
-png(file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/t-SNE/t-SNE_plot.png"),
-  width = 1400, height = 1000, res = 150
+save_static_png(result_tsne$static_tsne,
+  file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/t-SNE/t-SNE_plot.png"),
+  width = 1400, height = 1000
 )
-print(result_tsne$static_tsne)
-dev.off()
-
-# Save interactive t-SNE plot as RDS
-if (!is.null(result_tsne$interactive_tsne)) {
-  saveRDS(result_tsne$interactive_tsne,
-    file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/t-SNE/t-SNE_plot_interactive.rds")
-  )
-}
+save_interactive_rds(result_tsne$interactive_tsne,
+  file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/t-SNE/t-SNE_plot_interactive.rds"))
 
 write_tsv(result_tsne$tsne_result,
   file = file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/t-SNE/table_tsne_results.tsv")
@@ -361,18 +249,12 @@ result_umap <- dr_umap(
   minPts = NULL
 )
 
-png(file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/UMAP/UMAP_plot.png"),
-  width = 1400, height = 1000, res = 150
+save_static_png(result_umap$static_umap,
+  file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/UMAP/UMAP_plot.png"),
+  width = 1400, height = 1000
 )
-print(result_umap$static_umap)
-dev.off()
-
-# Save interactive UMAP plot as RDS
-if (!is.null(result_umap$interactive_umap)) {
-  saveRDS(result_umap$interactive_umap,
-    file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/UMAP/UMAP_plot_interactive.rds")
-  )
-}
+save_interactive_rds(result_umap$interactive_umap,
+  file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/UMAP/UMAP_plot_interactive.rds"))
 
 write_tsv(result_umap$umap_result,
   file = file.path(base_dir, "01.Profiling/02.Dimensionality_reduction/UMAP/UMAP_results.tsv")
@@ -399,18 +281,12 @@ result_heatmap_sample <- heatmap_correlation(
   type = "sample"
 )
 
-png(file.path(base_dir, "01.Profiling/03.Correlation_Heatmap/by_samples/Heatmap_by_samples.png"),
-  width = 2000, height = 2000, res = 150
+save_static_png(result_heatmap_sample$static_heatmap,
+  file.path(base_dir, "01.Profiling/03.Correlation_Heatmap/by_samples/Heatmap_by_samples.png"),
+  width = 2000, height = 2000
 )
-print(result_heatmap_sample$static_heatmap)
-dev.off()
-
-# Save interactive heatmap as RDS
-if (!is.null(result_heatmap_sample$interactive_heatmap)) {
-  saveRDS(result_heatmap_sample$interactive_heatmap,
-    file.path(base_dir, "01.Profiling/03.Correlation_Heatmap/by_samples/Heatmap_by_samples_interactive.rds")
-  )
-}
+save_interactive_rds(result_heatmap_sample$interactive_heatmap,
+  file.path(base_dir, "01.Profiling/03.Correlation_Heatmap/by_samples/Heatmap_by_samples_interactive.rds"))
 
 cat("  ✓ Sample correlation complete\n")
 
@@ -427,18 +303,12 @@ result_heatmap_category <- heatmap_correlation(
   type = "class"
 )
 
-png(file.path(base_dir, "01.Profiling/03.Correlation_Heatmap/by_category/Heatmap_by_category.png"),
-  width = 1500, height = 1500, res = 150
+save_static_png(result_heatmap_category$static_heatmap,
+  file.path(base_dir, "01.Profiling/03.Correlation_Heatmap/by_category/Heatmap_by_category.png"),
+  width = 1500, height = 1500
 )
-print(result_heatmap_category$static_heatmap)
-dev.off()
-
-# Save interactive heatmap as RDS
-if (!is.null(result_heatmap_category$interactive_heatmap)) {
-  saveRDS(result_heatmap_category$interactive_heatmap,
-    file.path(base_dir, "01.Profiling/03.Correlation_Heatmap/by_category/Heatmap_by_category_interactive.rds")
-  )
-}
+save_interactive_rds(result_heatmap_category$interactive_heatmap,
+  file.path(base_dir, "01.Profiling/03.Correlation_Heatmap/by_category/Heatmap_by_category_interactive.rds"))
 
 cat("  ✓ Category correlation complete\n")
 
@@ -455,18 +325,12 @@ result_heatmap_class <- heatmap_correlation(
   type = "class"
 )
 
-png(file.path(base_dir, "01.Profiling/03.Correlation_Heatmap/by_class/Heatmap_by_class.png"),
-  width = 1500, height = 1500, res = 150
+save_static_png(result_heatmap_class$static_heatmap,
+  file.path(base_dir, "01.Profiling/03.Correlation_Heatmap/by_class/Heatmap_by_class.png"),
+  width = 1500, height = 1500
 )
-print(result_heatmap_class$static_heatmap)
-dev.off()
-
-# Save interactive heatmap as RDS
-if (!is.null(result_heatmap_class$interactive_heatmap)) {
-  saveRDS(result_heatmap_class$interactive_heatmap,
-    file.path(base_dir, "01.Profiling/03.Correlation_Heatmap/by_class/Heatmap_by_class_interactive.rds")
-  )
-}
+save_interactive_rds(result_heatmap_class$interactive_heatmap,
+  file.path(base_dir, "01.Profiling/03.Correlation_Heatmap/by_class/Heatmap_by_class_interactive.rds"))
 
 write_tsv(as.data.frame(result_heatmap_class$corr_coef_matrix),
   file = file.path(base_dir, "01.Profiling/03.Correlation_Heatmap/by_class/Correlation_matrix.tsv")
@@ -485,50 +349,44 @@ cat("\n=== 5. LIPID CHARACTERISTICS ===\n")
 cat("Analyzing lipid composition by class...\n")
 result_lipid_class <- lipid_profiling(processed_se, char = "class")
 
-png(file.path(base_dir, "01.Profiling/04.Lipid_characteristics/Lipid_class_per_sample.png"),
-  width = 1000, height = 1000, res = 150
+save_static_png(result_lipid_class$static_char_barPlot,
+  file.path(base_dir, "01.Profiling/04.Lipid_characteristics/Lipid_class_per_sample.png"),
+  width = 1000, height = 1000
 )
-print(result_lipid_class$static_char_barPlot)
-dev.off()
-
-png(file.path(base_dir, "01.Profiling/04.Lipid_characteristics/Lipid_composition_per_sample.png"),
-  width = 1000, height = 1000, res = 150
+save_static_png(result_lipid_class$static_lipid_composition,
+  file.path(base_dir, "01.Profiling/04.Lipid_characteristics/Lipid_composition_per_sample.png"),
+  width = 1000, height = 1000
 )
-print(result_lipid_class$static_lipid_composition)
-dev.off()
 
 
 # Lipid profiling by Total Carbon
 cat("Analyzing lipid composition by Total.C...\n")
 result_totalC <- lipid_profiling(processed_se, char = "Total.C")
 
-png(file.path(base_dir, "01.Profiling/04.Lipid_characteristics/Total_C_per_sample.png"),
-  width = 1000, height = 1000, res = 150
+save_static_png(result_totalC$static_char_barPlot,
+  file.path(base_dir, "01.Profiling/04.Lipid_characteristics/Total_C_per_sample.png"),
+  width = 1000, height = 1000
 )
-print(result_totalC$static_char_barPlot)
-dev.off()
 
 
 # Lipid profiling by Total Double Bonds
 cat("Analyzing lipid composition by Total.DB...\n")
 result_totalDB <- lipid_profiling(processed_se, char = "Total.DB")
 
-png(file.path(base_dir, "01.Profiling/04.Lipid_characteristics/Total_DB_per_sample.png"),
-  width = 1000, height = 1000, res = 150
+save_static_png(result_totalDB$static_char_barPlot,
+  file.path(base_dir, "01.Profiling/04.Lipid_characteristics/Total_DB_per_sample.png"),
+  width = 1000, height = 1000
 )
-print(result_totalDB$static_char_barPlot)
-dev.off()
 
 
 # Lipid profiling by Category
 cat("Analyzing lipid composition by Category...\n")
 result_category <- lipid_profiling(processed_se, char = "Category")
 
-png(file.path(base_dir, "01.Profiling/04.Lipid_characteristics/Category_per_sample.png"),
-  width = 1000, height = 1000, res = 150
+save_static_png(result_category$static_char_barPlot,
+  file.path(base_dir, "01.Profiling/04.Lipid_characteristics/Category_per_sample.png"),
+  width = 1000, height = 1000
 )
-print(result_category$static_char_barPlot)
-dev.off()
 
 cat("  ✓ Lipid characteristics analysis complete\n")
 
@@ -562,10 +420,11 @@ print(names(res_list))
 if (!is.null(res_list$all_deSp_result)) {
   desp_df <- as.data.frame(res_list$all_deSp_result)
 
-  # Count significant lipids
-  n_sig <- sum(desp_df$adj.P.Val < 0.05, na.rm = TRUE)
+  # Count significant lipids (deSp_multiGroup() output uses the same lowercase
+  # pval/padj column names as deSp_twoGroup(), not limma-style P.Value/adj.P.Val)
+  n_sig <- sum(desp_df$padj < 0.05, na.rm = TRUE)
   cat("  Total lipids analyzed:", nrow(desp_df), "\n")
-  cat("  Significant lipids (adj.P.Val < 0.05):", n_sig, "\n")
+  cat("  Significant lipids (padj < 0.05):", n_sig, "\n")
 
   # Save all results
   write_tsv(desp_df,
@@ -574,7 +433,7 @@ if (!is.null(res_list$all_deSp_result)) {
 
   # Save significant results separately
   if (n_sig > 0) {
-    sig_df <- desp_df %>% filter(adj.P.Val < 0.05)
+    sig_df <- desp_df %>% filter(padj < 0.05)
     write_tsv(sig_df,
       file = file.path(base_dir, "02.DiffExp/01.ANOVA/ANOVA_significant_results.tsv")
     )
@@ -592,11 +451,10 @@ if (!is.null(res_list$all_deSp_result)) {
 deSp_plot <- plot_deSp_multiGroup(deSp_se)
 
 # Lollipop chart of significant lipids
-png(file.path(base_dir, "02.DiffExp/02.Visualizations/Lollipop_chart.png"),
-  width = 1000, height = 1000, res = 150
+save_static_png(deSp_plot$static_de_lipid,
+  file.path(base_dir, "02.DiffExp/02.Visualizations/Lollipop_chart.png"),
+  width = 1000, height = 1000
 )
-print(deSp_plot$static_de_lipid)
-dev.off()
 
 cat("  ✓ ANOVA analysis complete\n")
 
@@ -606,20 +464,12 @@ cat("  ✓ ANOVA analysis complete\n")
 cat("Generating pairwise comparison plots...\n")
 
 # Generate heatmap of significantly different lipids
-if (!is.null(deSp_plot$static_heatmap)) {
-  png(file.path(base_dir, "02.DiffExp/02.Visualizations/Heatmap_significant_lipids.png"),
-    width = 1500, height = 1200, res = 150
-  )
-  print(deSp_plot$static_heatmap)
-  dev.off()
-
-  # Save interactive heatmap as RDS
-  if (!is.null(deSp_plot$interactive_heatmap)) {
-    saveRDS(deSp_plot$interactive_heatmap,
-      file.path(base_dir, "02.DiffExp/02.Visualizations/Heatmap_significant_lipids_interactive.rds")
-    )
-  }
-}
+save_static_png(deSp_plot$static_heatmap,
+  file.path(base_dir, "02.DiffExp/02.Visualizations/Heatmap_significant_lipids.png"),
+  width = 1500, height = 1200
+)
+save_interactive_rds(deSp_plot$interactive_heatmap,
+  file.path(base_dir, "02.DiffExp/02.Visualizations/Heatmap_significant_lipids_interactive.rds"))
 
 cat("  ✓ Visualization complete\n")
 
@@ -630,12 +480,15 @@ cat("\n--- Creating individual lipid abundance boxplots ---\n")
 # Get significant lipids from ANOVA results
 if (exists("desp_df") && !is.null(desp_df) && nrow(desp_df) > 0) {
   # Check which p-value column is available
-  pval_col <- if ("adj.P.Val" %in% colnames(desp_df)) {
-    "adj.P.Val"
-  } else if ("adj.pval" %in% colnames(desp_df)) {
-    "adj.pval"
-  } else if ("P.Value" %in% colnames(desp_df)) {
-    "P.Value"
+  # Nominal (uncorrected) p-value first -- boxplots should cover every nominally
+  # significant lipid, not just the (usually much smaller/empty) FDR-significant set.
+  # deSp_multiGroup() output uses the same lowercase pval/padj columns as
+  # deSp_twoGroup(), not limma-style P.Value/adj.P.Val -- this previously meant the
+  # column lookup below always failed and no three-group boxplots were ever generated.
+  pval_col <- if ("pval" %in% colnames(desp_df)) {
+    "pval"
+  } else if ("padj" %in% colnames(desp_df)) {
+    "padj"
   } else {
     NULL
   }
@@ -676,8 +529,7 @@ if (exists("desp_df") && !is.null(desp_df) && nrow(desp_df) > 0) {
             transform = "log10"
           )
 
-          # Save the plot
-          png(
+          save_static_png(boxplot_result$static_boxPlot,
             file.path(
               base_dir,
               "02.DiffExp/03.Individual_lipid_boxplots",
@@ -685,8 +537,6 @@ if (exists("desp_df") && !is.null(desp_df) && nrow(desp_df) > 0) {
             ),
             width = 800, height = 600, res = 120
           )
-          print(boxplot_result$static_boxPlot)
-          dev.off()
 
           # Progress indicator every 10 lipids
           if (i %% 10 == 0) {
@@ -712,160 +562,17 @@ if (exists("desp_df") && !is.null(desp_df) && nrow(desp_df) > 0) {
 
 
 ##########################################################################################
-# 7. LIPID SET ENRICHMENT ANALYSIS (LSEA)
+# 7 & 8. LIPID SET ENRICHMENT ANALYSIS (LSEA) & OVER REPRESENTATION ANALYSIS (ORA)
 ##########################################################################################
 
-cat("\n=== 7. LIPID SET ENRICHMENT ANALYSIS (LSEA) ===\n")
+cat("\n=== 7 & 8. LSEA / ORA ===\n")
 
-# LSEA uses the differential expression results stored in deSp_se
-# It ranks lipids and tests for enrichment in different lipid sets
-
-# Perform LSEA using LipidSigR
-cat("Running LSEA by all characteristics...\n")
-
-# LSEA with all characteristics (comprehensive)
-lsea_all_result <- enrichment_lsea(
+run_lsea_ora(
   deSp_se,
-  char = NULL,  # NULL = all characteristics
-  rank_by = "statistic",  # Rank by test statistic
-  significant = "pval",
-  p_cutoff = 0.05
+  char_list = list(all_characteristics = NULL, by_class = "class", by_category = "Category"),
+  lsea_dir = file.path(base_dir, "03.Enrichment/LSEA"),
+  ora_dir = file.path(base_dir, "03.Enrichment/ORA")
 )
-
-# Display summary
-cat("  LSEA summary (all characteristics):\n")
-print(summary(lsea_all_result))
-
-# Save the barplot
-png(file.path(base_dir, "03.Enrichment/LSEA/LSEA_all_characteristics_barplot.png"),
-  width = 1200, height = 1000, res = 150
-)
-print(lsea_all_result$static_barPlot)
-dev.off()
-
-cat("  ✓ LSEA (all characteristics) complete\n\n")
-
-
-# LSEA by lipid class
-cat("Running LSEA by lipid class...\n")
-lsea_class_result <- enrichment_lsea(
-  deSp_se,
-  char = "class",
-  rank_by = "statistic",
-  significant = "pval",
-  p_cutoff = 0.05
-)
-
-cat("  LSEA summary (by class):\n")
-print(summary(lsea_class_result))
-
-# Save the barplot
-png(file.path(base_dir, "03.Enrichment/LSEA/LSEA_by_class_barplot.png"),
-  width = 1200, height = 1000, res = 150
-)
-print(lsea_class_result$static_barPlot)
-dev.off()
-
-cat("  ✓ LSEA by class complete\n\n")
-
-
-# LSEA by lipid category
-cat("Running LSEA by category...\n")
-lsea_category_result <- enrichment_lsea(
-  deSp_se,
-  char = "Category",
-  rank_by = "statistic",
-  significant = "pval",
-  p_cutoff = 0.05
-)
-
-cat("  LSEA summary (by category):\n")
-print(summary(lsea_category_result))
-
-# Save the barplot
-png(file.path(base_dir, "03.Enrichment/LSEA/LSEA_by_category_barplot.png"),
-  width = 1200, height = 1000, res = 150
-)
-print(lsea_category_result$static_barPlot)
-dev.off()
-
-cat("  ✓ LSEA by category complete\n")
-
-
-##########################################################################################
-# 8. OVER REPRESENTATION ANALYSIS (ORA)
-##########################################################################################
-
-cat("\n=== 8. OVER REPRESENTATION ANALYSIS (ORA) ===\n")
-
-# ORA identifies enriched lipid classes among significant lipid species
-# It classifies results into up-regulated, down-regulated, and non-significant
-
-# ORA with all characteristics
-cat("Running ORA for all characteristics...\n")
-ora_all_result <- enrichment_ora(
-  deSp_se,
-  char = NULL,  # NULL = all characteristics
-  significant = "pval",
-  p_cutoff = 0.05
-)
-
-# Display summary
-cat("  ORA summary (all characteristics):\n")
-print(summary(ora_all_result))
-
-# Save the barplot (top 10 up- and down-regulated terms)
-png(file.path(base_dir, "03.Enrichment/ORA/ORA_all_characteristics_barplot.png"),
-  width = 1200, height = 1000, res = 150
-)
-print(ora_all_result$static_barPlot)
-dev.off()
-
-cat("  ✓ ORA (all characteristics) complete\n\n")
-
-
-# ORA by lipid class
-cat("Running ORA by lipid class...\n")
-ora_class_result <- enrichment_ora(
-  deSp_se,
-  char = "class",
-  significant = "pval",
-  p_cutoff = 0.05
-)
-
-cat("  ORA summary (by class):\n")
-print(summary(ora_class_result))
-
-# Save the barplot
-png(file.path(base_dir, "03.Enrichment/ORA/ORA_by_class_barplot.png"),
-  width = 1200, height = 1000, res = 150
-)
-print(ora_class_result$static_barPlot)
-dev.off()
-
-cat("  ✓ ORA by class complete\n\n")
-
-
-# ORA by lipid category
-cat("Running ORA by category...\n")
-ora_category_result <- enrichment_ora(
-  deSp_se,
-  char = "Category",
-  significant = "pval",
-  p_cutoff = 0.05
-)
-
-cat("  ORA summary (by category):\n")
-print(summary(ora_category_result))
-
-# Save the barplot
-png(file.path(base_dir, "03.Enrichment/ORA/ORA_by_category_barplot.png"),
-  width = 1200, height = 1000, res = 150
-)
-print(ora_category_result$static_barPlot)
-dev.off()
-
-cat("  ✓ ORA by category complete\n")
 
 
 ##########################################################################################
@@ -883,4 +590,3 @@ cat("  - Lipid characteristics profiles\n")
 cat("  - ANOVA differential expression results\n")
 cat("  - LSEA enrichment analysis\n")
 cat("\n")
-
